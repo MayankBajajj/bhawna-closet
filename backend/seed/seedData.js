@@ -15,7 +15,7 @@ const sampleProducts = [
     description: 'A luxurious and comfortable two-piece set featuring a plush velvet finish in soft blush pink. Perfect for cozy yet stylish outings.',
     price: 2499,
     discountPrice: 2199,
-    category: 'Coordsets',
+    category: 'Cordsets',
     images: [
       'https://images.unsplash.com/photo-1609505848912-b7c3b8b4beda?q=80&w=600&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=600&auto=format&fit=crop'
@@ -35,7 +35,7 @@ const sampleProducts = [
     name: 'Elegant Rose Blazer Set',
     description: 'Tailored pink blazer paired with matching slim-fit trousers. Perfect for power-dressing with a feminine touch.',
     price: 3899,
-    category: 'Coordsets',
+    category: 'Cordsets',
     images: [
       'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=600&auto=format&fit=crop'
     ],
@@ -54,7 +54,7 @@ const sampleProducts = [
     name: 'Pastel Summer Coord Set',
     description: 'Breathable linen-blend crop top and wide-leg trousers set in solid baby pink. High comfort and elegant look.',
     price: 1899,
-    category: 'Coordsets',
+    category: 'Cordsets',
     images: [
       'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop'
     ],

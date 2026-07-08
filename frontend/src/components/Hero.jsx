@@ -48,7 +48,7 @@ export default function Hero({ onExploreClick }) {
         <div className="hero-image-wrapper">
           <div className="hero-image-backdrop"></div>
           <img
-            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop"
+            src="https://res.cloudinary.com/jbhylwfb/image/upload/v1782921971/bhawna_closet_products/f6c6ykyn8wgxvfa4xtsn.jpg"
             alt="Bhawna Closet Premium Fashion"
             className="hero-main-image"
           />
@@ -56,7 +56,7 @@ export default function Hero({ onExploreClick }) {
           <div className="floating-glass-card glass-card">
             <span className="floating-emoji">🌸</span>
             <div>
-              <h4>Trending Coordsets</h4>
+              <h4>Trending Cordsets</h4>
               <p>Now in store</p>
             </div>
           </div>
@@ -234,19 +234,57 @@ export default function Hero({ onExploreClick }) {
           }
         }
         @media (max-width: 576px) {
+          .hero-section {
+            padding: 3.5rem 0 2rem 0 !important;
+          }
           .hero-content h1 {
-            font-size: 2.5rem;
+            font-size: 2.1rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 1.5rem !important;
+          }
+          .hero-description {
+            display: none !important;
           }
           .hero-actions {
-            flex-direction: column;
-            gap: 1rem;
+            flex-direction: row !important;
+            justify-content: center !important;
+            gap: 0.75rem !important;
+            margin-bottom: 2.5rem !important;
+          }
+          .hero-actions .btn {
+            padding: 0.75rem 1.25rem !important;
+            font-size: 0.85rem !important;
+            width: auto !important;
           }
           .hero-metrics {
-            flex-direction: column;
-            gap: 1rem;
+            display: none !important;
+          }
+          .metric-item h3 {
+            font-size: 1.4rem !important;
+          }
+          .metric-item p {
+            font-size: 0.7rem !important;
           }
           .metric-line {
-            display: none;
+            display: block !important;
+            height: 25px !important;
+          }
+          .hero-main-image {
+            max-width: 290px !important;
+            height: 380px !important;
+          }
+          .floating-glass-card {
+            left: -15px !important;
+            bottom: 40px !important;
+            padding: 0.5rem 0.75rem !important;
+          }
+          .floating-glass-card-2 {
+            right: -15px !important;
+            top: 40px !important;
+            padding: 0.5rem 0.75rem !important;
+          }
+          .floating-emoji {
+            font-size: 1.1rem !important;
           }
         }
       `}</style>

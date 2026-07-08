@@ -1002,6 +1002,26 @@ export default function CartPage({ onContinueShopping, onSelectProductBySlug }) 
             grid-template-columns: 1fr;
             gap: 1.25rem;
           }
+          .cart-banner {
+            padding: 2rem 1.25rem !important;
+            margin-bottom: 1.5rem !important;
+          }
+          .cart-banner h1 {
+            font-size: 1.8rem !important;
+          }
+          .cart-summary-panel, .checkout-form-panel {
+            padding: 1.25rem !important;
+          }
+          .checkout-success-card {
+            padding: 1.5rem 1rem !important;
+          }
+          .cart-item-card {
+            padding: 1rem !important;
+            gap: 1rem !important;
+          }
+          .item-name {
+            font-size: 1rem !important;
+          }
         }
       `}</style>
     </main>

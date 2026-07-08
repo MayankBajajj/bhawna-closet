@@ -19,6 +19,7 @@ import orderRoutes from './routes/orders.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 import Admin from './models/Admin.js';
 import Category from './models/Category.js';
+import Product from './models/Product.js';
 
 // Load environment variables
 dotenv.config();
@@ -42,8 +43,18 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // CORS configuration
+const allowedOrigins = ['https://bhawnacloset.com', 'https://www.bhawnacloset.com'];
+if (process.env.CORS_ORIGIN) {
+  allowedOrigins.push(process.env.CORS_ORIGIN);
+}
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('http://localhost:')) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
@@ -88,8 +99,17 @@ app.use(errorHandler);
 // Helper function to seed default categories and admin user
 const seedAdminAndCategories = async () => {
   try {
-    // Seed default categories
-    const defaultCategories = ['Coordsets', 'Dresses', 'Tops & Shirts', 'Bottoms'];
+    // Delete the old "Coordsets" category document if it exists
+    await Category.deleteOne({ name: 'Coordsets' });
+
+    // Migrate all products in the database from "Coordsets" to "Cordsets"
+    const updateResult = await Product.updateMany({ category: 'Coordsets' }, { category: 'Cordsets' });
+    if (updateResult.modifiedCount > 0) {
+      console.log(`Migrated ${updateResult.modifiedCount} products from 'Coordsets' to 'Cordsets'`);
+    }
+
+    // Seed default categories (with "Cordsets")
+    const defaultCategories = ['Cordsets', 'Dresses', 'Tops & Shirts', 'Bottoms'];
     for (const catName of defaultCategories) {
       const exists = await Category.findOne({ name: catName });
       if (!exists) {

@@ -168,28 +168,28 @@ function AppContent() {
               <div className="categories-grid">
                 {[
                   {
-                    name: 'Coordsets',
-                    title: 'Coordsets Collection',
+                    name: 'Cordsets',
+                    title: 'Cordsets Collection',
                     desc: 'Perfect matching sets for effortless styling.',
-                    img: 'https://images.unsplash.com/photo-1609505848912-b7c3b8b4beda?q=80&w=600&auto=format&fit=crop',
+                    img: 'https://res.cloudinary.com/jbhylwfb/image/upload/v1782904627/bhawna_closet_products/xe17qrmuztgeb3afmyil.jpg',
                   },
                   {
                     name: 'Dresses',
                     title: 'Dresses Collection',
                     desc: 'Flowy, elegant dresses for every occasion.',
-                    img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=600&auto=format&fit=crop',
+                    img: 'https://res.cloudinary.com/jbhylwfb/image/upload/v1782921971/bhawna_closet_products/f6c6ykyn8wgxvfa4xtsn.jpg',
                   },
                   {
                     name: 'Tops & Shirts',
                     title: 'Tops & Shirts Collection',
                     desc: 'Classic silhouettes blended with modern flair.',
-                    img: 'https://images.unsplash.com/photo-1534126511673-b6899657816a?q=80&w=600&auto=format&fit=crop',
+                    img: 'https://res.cloudinary.com/jbhylwfb/image/upload/v1782924572/bhawna_closet_products/cmjsodena4ei2zmim00r.jpg',
                   },
                   {
                     name: 'Bottoms',
                     title: 'Bottoms Collection',
                     desc: 'Tailored trousers, skirts, and relaxed fits.',
-                    img: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&auto=format&fit=crop',
+                    img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop',
                   }
                 ].map((cat) => (
                   <div 
@@ -260,7 +260,7 @@ function AppContent() {
                   At <strong>Bhawna Closet</strong>, we believe that clothes are not just garments—they are expressions of confidence. Curated specifically for girls who appreciate style, grace, and premium fabrics, our collections are handpicked to provide the perfect fit for your lifestyle.
                 </p>
                 <p>
-                  Whether you are stepping into a business lunch with a sharp pink blazer-set, going for a picnic in our flowy pastel Sakura midi dress, or enjoying a brunch in our comfortable coordsets, we have you covered.
+                  Whether you are stepping into a business lunch with a sharp pink blazer-set, going for a picnic in our flowy pastel Sakura midi dress, or enjoying a brunch in our comfortable cordsets, we have you covered.
                 </p>
                 <div className="about-store-badges">
                   <div className="store-badge-card glass-card">
@@ -300,7 +300,7 @@ function AppContent() {
               <div className="filter-group">
                 <SlidersHorizontal size={18} className="filter-icon" />
                 <div className="filter-tabs">
-                  {['All', 'Coordsets', 'Dresses', 'Tops & Shirts', 'Bottoms'].map((cat) => (
+                  {['All', 'Cordsets', 'Dresses', 'Tops & Shirts', 'Bottoms'].map((cat) => (
                     <button
                       key={cat}
                       className={`filter-tab-btn ${categoryFilter === cat ? 'active' : ''}`}
@@ -900,12 +900,61 @@ function AppContent() {
             max-width: 100%;
           }
         }
-        @media (max-width: 576px) {
-          .insta-grid {
-            grid-template-columns: repeat(2, 1fr);
+        @media (max-width: 768px) {
+          .filter-group {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+          }
+          .filter-group::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Edge */
           }
           .filter-tabs {
-            flex-wrap: wrap;
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+            padding: 0.25rem 0;
+          }
+        }
+        @media (max-width: 576px) {
+          .products-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.75rem !important;
+          }
+          .category-card {
+            height: 280px !important;
+          }
+          .category-card-overlay {
+            padding: 1.25rem !important;
+          }
+          .category-card-overlay h3 {
+            font-size: 1.2rem !important;
+          }
+          .category-card-overlay p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+          }
+          .about-image {
+            height: 320px !important;
+          }
+          .collections-banner {
+            padding: 2rem 1.25rem !important;
+            margin-bottom: 1.5rem !important;
+          }
+          .collections-banner h1 {
+            font-size: 1.8rem !important;
+          }
+          .collections-banner p {
+            font-size: 0.9rem !important;
+          }
+          .filters-row {
+            gap: 1rem !important;
+            padding: 1rem !important;
+            margin-bottom: 1.5rem !important;
           }
           .about-store-badges {
             grid-template-columns: 1fr;

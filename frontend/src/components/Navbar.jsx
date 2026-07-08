@@ -472,8 +472,8 @@ export default function Navbar({ activeTab, setActiveTab }) {
           }
         }
         @media (max-width: 768px) {
-          .navbar-desktop, .nav-phone-btn {
-            display: none;
+          .navbar-desktop, .nav-phone-btn, .navbar-auth-buttons, .profile-dropdown-wrapper {
+            display: none !important;
           }
           .mobile-menu-toggle {
             display: block;
@@ -482,7 +482,11 @@ export default function Navbar({ activeTab, setActiveTab }) {
             display: flex;
           }
           .navbar-logo {
-            font-size: 1.5rem;
+            font-size: 1.3rem !important;
+            white-space: nowrap !important;
+          }
+          .navbar-actions {
+            gap: 0.75rem !important;
           }
         }
       `}</style>

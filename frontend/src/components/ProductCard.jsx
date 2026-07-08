@@ -172,6 +172,34 @@ export default function ProductCard({ product, onSelectProduct }) {
           border-radius: 4px;
           border: 1px solid var(--border-light);
         }
+        @media (max-width: 576px) {
+          .product-image-container {
+            height: 200px !important;
+          }
+          .product-info {
+            padding: 0.75rem !important;
+          }
+          .product-name {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.25rem !important;
+          }
+          .product-price {
+            font-size: 0.95rem !important;
+          }
+          .product-original-price-strike {
+            font-size: 0.75rem !important;
+          }
+          .product-sizes {
+            font-size: 0.65rem !important;
+            padding: 0.1rem 0.3rem !important;
+          }
+          .product-category-badge {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.5rem !important;
+            top: 8px !important;
+            left: 8px !important;
+          }
+        }
       `}</style>
     </div>
   );

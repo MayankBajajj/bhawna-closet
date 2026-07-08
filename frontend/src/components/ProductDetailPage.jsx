@@ -286,7 +286,7 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
           <section className="related-section">
             <div className="section-header">
               <h2>You May Also Like</h2>
-              <p>Explore matching coordsets or dresses from the same collection.</p>
+              <p>Explore matching cordsets or dresses from the same collection.</p>
             </div>
             <div className="products-grid">
               {relatedProducts.map((relProduct) => (

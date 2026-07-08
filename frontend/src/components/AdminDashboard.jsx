@@ -36,7 +36,7 @@ export default function AdminDashboard() {
     description: '',
     price: '',
     discountPrice: '',
-    category: 'Coordsets',
+    category: 'Cordsets',
     isFeatured: false,
     isNewArrival: false
   });
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
   const [imagePreviews, setImagePreviews] = useState([]); // object URLs for new files
   const [existingImages, setExistingImages] = useState([]); // URLs from database
 
-  const categoriesList = ['Coordsets', 'Dresses', 'Tops & Shirts', 'Bottoms'];
+  const categoriesList = ['Cordsets', 'Dresses', 'Tops & Shirts', 'Bottoms'];
 
   // Fetch Stats
   const fetchStats = async () => {
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
       description: '',
       price: '',
       discountPrice: '',
-      category: 'Coordsets',
+      category: 'Cordsets',
       isFeatured: false,
       isNewArrival: false
     });

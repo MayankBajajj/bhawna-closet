@@ -53,7 +53,7 @@ export default function Footer({ setActiveTab }) {
               <button onClick={() => handleNavClick('home')}>Home</button>
             </li>
             <li>
-              <button onClick={() => handleNavClick('collections')}>Coordsets Collection</button>
+              <button onClick={() => handleNavClick('collections')}>Cordsets Collection</button>
             </li>
             <li>
               <button onClick={() => handleNavClick('collections')}>Dresses Collection</button>
