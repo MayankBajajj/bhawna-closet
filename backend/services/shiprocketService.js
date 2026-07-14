@@ -113,6 +113,15 @@ export const syncOrderToShiprocket = async (orderId) => {
       billing_email: order.userId.email || "bhawnacloset.customer@gmail.com",
       billing_phone: address.phone,
       shipping_is_billing: true,
+      shipping_customer_name: address.name.split(' ')[0] || 'Customer',
+      shipping_last_name: address.name.split(' ').slice(1).join(' ') || '',
+      shipping_address: address.street,
+      shipping_city: address.city,
+      shipping_pincode: address.pincode,
+      shipping_state: address.state,
+      shipping_country: "India",
+      shipping_email: order.userId.email || "bhawnacloset.customer@gmail.com",
+      shipping_phone: address.phone,
       order_items: order.items.map(item => ({
         name: item.productId.name,
         sku: item.productId.sku || `SKU-${item.productId._id.toString().slice(-6)}`,
@@ -127,6 +136,7 @@ export const syncOrderToShiprocket = async (orderId) => {
       weight: 0.5
     };
 
+    console.log('Shiprocket API Payload:', JSON.stringify(payload, null, 2));
     console.log(`Sending order ${order._id} to Shiprocket...`);
     const res = await fetch('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', {
       method: 'POST',

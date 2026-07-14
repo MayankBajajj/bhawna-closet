@@ -33,7 +33,14 @@ export default function CartPage({ onContinueShopping, onSelectProductBySlug }) 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'phone') {
-      const cleanVal = value.replace(/\D/g, '').slice(0, 10);
+      let cleanVal = value.replace(/\D/g, '');
+      if (cleanVal.startsWith('0')) {
+        cleanVal = cleanVal.substring(1);
+      }
+      if (cleanVal.startsWith('91') && cleanVal.length > 10) {
+        cleanVal = cleanVal.substring(2);
+      }
+      cleanVal = cleanVal.slice(0, 10);
       setAddressForm(prev => ({ ...prev, [name]: cleanVal }));
     } else {
       setAddressForm(prev => ({ ...prev, [name]: value }));

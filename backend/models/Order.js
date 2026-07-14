@@ -65,7 +65,6 @@ const orderSchema = new mongoose.Schema({
   shiprocketOrderId: {
     type: String,
     default: '',
-    unique: true,
     sparse: true,
     index: true
   },
