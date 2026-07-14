@@ -72,6 +72,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithToken = (data) => {
+    localStorage.setItem('userToken', data.token);
+    setUser({ _id: data._id, name: data.name, email: data.email });
+  };
+
   const logout = () => {
     localStorage.removeItem('userToken');
     setUser(null);
@@ -117,6 +122,7 @@ export const AuthProvider = ({ children }) => {
       login,
       signup,
       logout,
+      loginWithToken,
       loginAdmin,
       logoutAdmin,
       updateUserProfile,

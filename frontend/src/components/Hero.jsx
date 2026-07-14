@@ -237,6 +237,9 @@ export default function Hero({ onExploreClick }) {
           .hero-section {
             padding: 3.5rem 0 2rem 0 !important;
           }
+          .hero-container {
+            gap: 1.5rem !important;
+          }
           .hero-content h1 {
             font-size: 2.1rem !important;
             line-height: 1.2 !important;
@@ -249,7 +252,7 @@ export default function Hero({ onExploreClick }) {
             flex-direction: row !important;
             justify-content: center !important;
             gap: 0.75rem !important;
-            margin-bottom: 2.5rem !important;
+            margin-bottom: 1.5rem !important;
           }
           .hero-actions .btn {
             padding: 0.75rem 1.25rem !important;

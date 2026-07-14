@@ -6,6 +6,7 @@ import Order from '../models/Order.js';
 import Category from '../models/Category.js';
 import { generateToken } from '../services/userService.js';
 import { isCloudinaryConfigured } from '../config/cloudinary.js';
+import { syncOrderToShiprocket } from '../services/shiprocketService.js';
 import {
   createProductService,
   updateProductService,
@@ -233,6 +234,16 @@ export const updateOrderStatus = async (req, res, next) => {
           { arrayFilters: [{ 'elem.size': item.size }] }
         );
       }
+    }
+
+    // If order transitions to Accepted or Processing, trigger Shiprocket Sync
+    if (
+      (status === 'Accepted' || status === 'Processing') &&
+      order.shiprocketSyncStatus === 'Pending'
+    ) {
+      syncOrderToShiprocket(order._id).catch(err => {
+        console.error(`Admin triggered Shiprocket sync failed for order ${order._id}:`, err.message);
+      });
     }
 
     await order.save();

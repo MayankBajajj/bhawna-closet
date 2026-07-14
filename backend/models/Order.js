@@ -50,9 +50,64 @@ const orderSchema = new mongoose.Schema({
   },
   paymentStatus: {
     type: String,
-    enum: ['Pending', 'Paid'],
+    enum: ['Pending', 'Paid', 'Failed', 'Refunded', 'Partially Refunded'],
     default: 'Pending'
   },
+  razorpayOrderId: {
+    type: String,
+    default: '',
+    index: true
+  },
+  paymentReference: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Payment'
+  },
+  shiprocketOrderId: {
+    type: String,
+    default: '',
+    unique: true,
+    sparse: true,
+    index: true
+  },
+  shiprocketShipmentId: {
+    type: String,
+    default: ''
+  },
+  shiprocketSyncStatus: {
+    type: String,
+    enum: ['Pending', 'Synced', 'Failed'],
+    default: 'Pending'
+  },
+  shiprocketSyncAttempts: {
+    type: Number,
+    default: 0
+  },
+  trackingNumber: {
+    type: String,
+    default: ''
+  },
+  courierName: {
+    type: String,
+    default: ''
+  },
+  trackingUrl: {
+    type: String,
+    default: ''
+  },
+  timeline: [{
+    status: {
+      type: String,
+      required: true
+    },
+    note: {
+      type: String,
+      default: ''
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   shippingAddress: {
     type: String,
     required: true

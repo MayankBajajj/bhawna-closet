@@ -316,9 +316,50 @@ export default function MyAccountPage() {
                         ))}
                       </div>
 
+                      {/* Shipment Tracking Details */}
+                      {order.trackingNumber && (
+                        <div className="order-tracking-box">
+                          <div className="tracking-header">
+                            <span>Courier Carrier: <strong className="pink-text">{order.courierName || 'Shiprocket'}</strong></span>
+                            <span>AWB Tracking: <strong>{order.trackingNumber}</strong></span>
+                          </div>
+                          {order.trackingUrl && (
+                            <a href={order.trackingUrl} target="_blank" rel="noopener noreferrer" className="btn-track-package">
+                              Track Package
+                            </a>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Timeline Audit Logs */}
+                      {order.timeline && order.timeline.length > 0 && (
+                        <div className="order-timeline-wrapper">
+                          <span className="timeline-title">Delivery Status Updates</span>
+                          <div className="timeline-items">
+                            {order.timeline.map((event, index) => (
+                              <div key={index} className="timeline-event-item">
+                                <div className="event-indicator">
+                                  <div className="event-dot"></div>
+                                  {index < order.timeline.length - 1 && <div className="event-line"></div>}
+                                </div>
+                                <div className="event-details">
+                                  <div className="event-header">
+                                    <span className="event-status">{event.status}</span>
+                                    <span className="event-date">
+                                      {new Date(event.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                  </div>
+                                  {event.note && <span className="event-note">{event.note}</span>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="order-card-footer">
                         <div className="footer-meta">
-                          <span>Payment: <strong>{order.paymentMethod} (Pending Verification)</strong></span>
+                          <span>Payment: <strong>{order.paymentMethod} ({order.paymentStatus})</strong></span>
                         </div>
                         <div className="footer-total">
                           <span>Total Amount:</span>
@@ -662,6 +703,117 @@ export default function MyAccountPage() {
         
         .h-full {
           height: 100%;
+        }
+        
+        /* Shipping Tracking Styles */
+        .order-tracking-box {
+          background: var(--light-pink);
+          border: 1px solid var(--border-pink);
+          border-radius: 12px;
+          padding: 1.25rem;
+          margin-top: 1rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        }
+        .tracking-header {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          font-size: 0.85rem;
+          color: var(--dark-charcoal);
+        }
+        .pink-text {
+          color: var(--primary-pink-dark);
+        }
+        .btn-track-package {
+          background: var(--primary-pink);
+          color: var(--pure-white);
+          padding: 0.6rem 1.2rem;
+          border-radius: 30px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          box-shadow: 0 2px 8px rgba(240, 84, 138, 0.2);
+          transition: all var(--transition-fast);
+        }
+        .btn-track-package:hover {
+          background: var(--primary-pink-hover);
+          transform: translateY(-1px);
+        }
+        
+        .order-timeline-wrapper {
+          border-top: 1px dashed var(--border-light);
+          padding-top: 1.25rem;
+          margin-top: 1rem;
+        }
+        .timeline-title {
+          display: block;
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--dark-charcoal);
+          margin-bottom: 1rem;
+        }
+        .timeline-items {
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          padding-left: 0.5rem;
+        }
+        .timeline-event-item {
+          display: flex;
+          gap: 1.25rem;
+        }
+        .event-indicator {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+        }
+        .event-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--primary-pink);
+          border: 2px solid var(--pure-white);
+          box-shadow: 0 0 0 2px var(--primary-pink);
+          z-index: 2;
+        }
+        .event-line {
+          width: 2px;
+          background: var(--border-pink);
+          position: absolute;
+          top: 10px;
+          bottom: -20px;
+          z-index: 1;
+        }
+        .event-details {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          flex-grow: 1;
+        }
+        .event-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          gap: 1rem;
+        }
+        .event-status {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--dark-charcoal);
+        }
+        .event-date {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          font-weight: 500;
+        }
+        .event-note {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          line-height: 1.4;
         }
         
         @media (max-width: 992px) {

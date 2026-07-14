@@ -3,6 +3,7 @@ import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, Check, AlertCircle, Arrow
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderService } from '../services/orderService';
+import { request } from '../services/api';
 
 export default function CartPage({ onContinueShopping, onSelectProductBySlug }) {
   const { user } = useAuth();
@@ -57,6 +58,20 @@ export default function CartPage({ onContinueShopping, onSelectProductBySlug }) 
     setStep('checkout');
   };
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (!addressForm.name || !addressForm.phone || !addressForm.street || !addressForm.city || !addressForm.state || !addressForm.pincode) {
@@ -84,13 +99,89 @@ export default function CartPage({ onContinueShopping, onSelectProductBySlug }) 
     };
 
     try {
-      const response = await orderService.createOrder(orderData);
-      setPlacedOrder(response.order);
-      clearCart();
-      setStep('success');
+      if (addressForm.paymentMethod === 'COD') {
+        const response = await orderService.createOrder(orderData);
+        setPlacedOrder(response.order);
+        clearCart();
+        setStep('success');
+      } else {
+        // Online Payment Flow (Razorpay)
+        const scriptLoaded = await loadRazorpayScript();
+        if (!scriptLoaded) {
+          throw new Error('Failed to load Razorpay SDK. Please check your internet connection.');
+        }
+
+        // 1. Create Razorpay order on backend
+        const rzpOrder = await request('/payments/razorpay/order', {
+          method: 'POST',
+          body: JSON.stringify({
+            items: orderData.items,
+            totalAmount: orderData.totalAmount,
+            shippingAddress: orderData.shippingAddress
+          })
+        }, false);
+
+        // 2. Open Razorpay Modal
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TDIymjqPZZxw53',
+          amount: rzpOrder.amount,
+          currency: rzpOrder.currency,
+          name: 'Bhawna Closet',
+          description: 'Secure Payment for your Order',
+          order_id: rzpOrder.id,
+          handler: async function (response) {
+            try {
+              setCheckingOut(true);
+              setOrderError('Verifying your payment, please do not close this window...');
+              
+              // 3. Verify Payment on Backend
+              const verifyRes = await request('/payments/razorpay/verify', {
+                method: 'POST',
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  shippingDetails: {
+                    shippingAddress: orderData.shippingAddress,
+                    items: orderData.items
+                  }
+                })
+              }, false);
+
+              setPlacedOrder(verifyRes.order);
+              clearCart();
+              setStep('success');
+            } catch (err) {
+              setOrderError(err.message || 'Payment verification failed. Please contact support.');
+            } finally {
+              setCheckingOut(false);
+            }
+          },
+          prefill: {
+            name: addressForm.name,
+            contact: addressForm.phone,
+            email: user.email
+          },
+          theme: {
+            color: '#f0548a'
+          },
+          modal: {
+            ondismiss: function() {
+              setCheckingOut(false);
+              setOrderError('Payment cancelled by user.');
+            }
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (resp) {
+          setOrderError(`Payment failed: ${resp.error.description || 'Unknown error'}`);
+          setCheckingOut(false);
+        });
+        rzp.open();
+      }
     } catch (err) {
       setOrderError(err.message || 'Failed to place order. Please try again.');
-    } finally {
       setCheckingOut(false);
     }
   };
@@ -410,16 +501,17 @@ export default function CartPage({ onContinueShopping, onSelectProductBySlug }) 
                     </div>
                   </label>
 
-                  <label className="payment-option-label disabled-payment-option" title="Integrating soon">
+                  <label className={`payment-option-label ${addressForm.paymentMethod === 'Online' ? 'active-payment' : ''}`}>
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="Online"
-                      disabled
+                      checked={addressForm.paymentMethod === 'Online'}
+                      onChange={handleInputChange}
                     />
                     <div className="payment-label-text">
-                      <strong>Online UPI / Card Payment (Integrating Soon)</strong>
-                      <span>Direct checkout via credit card or UPI.</span>
+                      <strong>Online UPI / Card / NetBanking</strong>
+                      <span>Pay securely online via Razorpay.</span>
                     </div>
                   </label>
                 </div>

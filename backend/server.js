@@ -15,11 +15,14 @@ import wishlistRoutes from './routes/wishlist.js';
 import categoryRoutes from './routes/categories.js';
 import inquiryRoutes from './routes/inquiry.js';
 import orderRoutes from './routes/orders.js';
+import paymentRoutes from './routes/payments.js';
+import shippingRoutes from './routes/shipping.js';
 
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 import Admin from './models/Admin.js';
 import Category from './models/Category.js';
 import Product from './models/Product.js';
+import { startShiprocketSyncRetryLoop } from './services/shiprocketService.js';
 
 // Load environment variables
 dotenv.config();
@@ -59,7 +62,11 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf.toString();
+  }
+}));
 
 // Serve static uploads for local testing fallback
 const __filename = fileURLToPath(import.meta.url);
@@ -76,6 +83,8 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/shipping', shippingRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -143,6 +152,8 @@ mongoose.connect(MONGODB_URI)
     console.log('Successfully connected to MongoDB.');
     // Run auto-seeding
     await seedAdminAndCategories();
+    // Start Shiprocket background sync retry worker
+    startShiprocketSyncRetryLoop();
     // Start server
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

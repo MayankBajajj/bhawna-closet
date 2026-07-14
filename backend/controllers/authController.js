@@ -1,4 +1,4 @@
-import { registerUser, loginUser } from '../services/userService.js';
+import { registerUser, loginUser, generateToken } from '../services/userService.js';
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
 import { sendEmail } from '../services/emailService.js';
@@ -154,6 +154,95 @@ export const changePassword = async (req, res, next) => {
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
     res.status(400);
+    next(error);
+  }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Please provide an email address' });
+    }
+
+    // Check if user is registered
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(404).json({ message: 'Email address not registered' });
+    }
+
+    // Generate 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Save/Update to Otp collection (expires in 5 minutes)
+    await Otp.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { otp, createdAt: Date.now() },
+      { upsert: true, new: true }
+    );
+
+    // Send email
+    const subject = 'Reset Password OTP - Bhawna Closet';
+    const text = `Hello,
+
+We received a request to reset your password for your Bhawna Closet account.
+
+Please enter the following One-Time Password (OTP) code to verify your request:
+
+OTP Code: ${otp}
+
+This OTP is valid for 5 minutes. If you did not request this password reset, please ignore this email.
+
+Best regards,
+Bhawna Closet Team`;
+
+    await sendEmail(email.toLowerCase(), subject, text);
+
+    res.status(200).json({ message: 'Password reset OTP verification code sent to your email.' });
+  } catch (error) {
+    res.status(500);
+    next(error);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ message: 'Please provide email, OTP code, and new password' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    // Check if user is registered
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(404).json({ message: 'Email address not registered' });
+    }
+
+    // Verify OTP
+    const record = await Otp.findOne({ email: email.toLowerCase() });
+    if (!record || record.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid or expired OTP code' });
+    }
+
+    // Delete OTP
+    await Otp.deleteOne({ email: email.toLowerCase() });
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    // Auto-login user
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id)
+    });
+  } catch (error) {
+    res.status(500);
     next(error);
   }
 };
