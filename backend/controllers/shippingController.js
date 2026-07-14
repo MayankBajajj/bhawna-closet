@@ -49,41 +49,35 @@ export const shiprocketWebhook = async (req, res, next) => {
       payload: payload
     });
 
-    const localOrderId = payload.order_id;
-    if (localOrderId) {
-      const order = await Order.findById(localOrderId);
-      if (order) {
-        // Map updates
-        order.trackingNumber = payload.awb || order.trackingNumber;
-        order.courierName = payload.courier_name || order.courierName;
-        order.trackingUrl = payload.tracking_url || order.trackingUrl;
-        
-        const shipStatus = payload.current_status ? payload.current_status.toLowerCase() : '';
-        
-        // Map Shiprocket statuses to our local Order statuses
-        if (shipStatus === 'shipped' || shipStatus === 'dispatched') {
-          order.status = 'Shipped';
-        } else if (shipStatus === 'delivered') {
-          order.status = 'Delivered';
-          order.paymentStatus = 'Paid'; // If delivered, mark COD as paid!
-        } else if (shipStatus === 'cancelled' || shipStatus === 'return') {
-          order.status = 'Cancelled';
-        } else if (shipStatus === 'pickup_scheduled' || shipStatus === 'pickup_generated') {
-          order.status = 'Processing';
-        }
-
-        // Add to timeline
-        order.timeline.push({
-          status: payload.current_status || 'Update',
-          note: `Carrier: ${payload.courier_name || 'N/A'}. Details: ${payload.etd || payload.current_status_id || 'Status updated.'}`
-        });
-
-        await order.save();
-        log.processed = true;
-        await log.save();
-        console.log(`Order ${order._id} tracking status updated via Shiprocket webhook.`);
-      }
+    // Map updates
+    order.trackingNumber = payload.awb || order.trackingNumber;
+    order.courierName = payload.courier_name || order.courierName;
+    order.trackingUrl = payload.tracking_url || order.trackingUrl;
+    
+    const shipStatus = payload.current_status ? payload.current_status.toLowerCase() : '';
+    
+    // Map Shiprocket statuses to our local Order statuses
+    if (shipStatus === 'shipped' || shipStatus === 'dispatched') {
+      order.status = 'Shipped';
+    } else if (shipStatus === 'delivered') {
+      order.status = 'Delivered';
+      order.paymentStatus = 'Paid'; // If delivered, mark COD as paid!
+    } else if (shipStatus === 'cancelled' || shipStatus === 'return') {
+      order.status = 'Cancelled';
+    } else if (shipStatus === 'pickup_scheduled' || shipStatus === 'pickup_generated') {
+      order.status = 'Processing';
     }
+
+    // Add to timeline
+    order.timeline.push({
+      status: payload.current_status || 'Update',
+      note: `Carrier: ${payload.courier_name || 'N/A'}. Details: ${payload.etd || payload.current_status_id || 'Status updated.'}`
+    });
+
+    await order.save();
+    log.processed = true;
+    await log.save();
+    console.log(`Order ${order._id} tracking status updated via Shiprocket webhook.`);
 
     res.status(200).send('OK');
   } catch (error) {
