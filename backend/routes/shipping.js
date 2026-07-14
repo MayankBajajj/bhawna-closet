@@ -5,7 +5,7 @@ import { protectAdmin } from '../middleware/adminMiddleware.js';
 const router = express.Router();
 
 // Webhook for Shiprocket status updates (public)
-router.post('/delivery-updates', shiprocketWebhook);
+router.post('/updates', shiprocketWebhook);
 
 // Admin manual tracking sync trigger
 router.post('/orders/:id/sync', protectAdmin, syncOrderTracking);

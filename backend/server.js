@@ -84,7 +84,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/shipping', shippingRoutes);
+app.use('/api/delivery', shippingRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
