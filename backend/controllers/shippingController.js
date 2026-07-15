@@ -68,10 +68,35 @@ export const shiprocketWebhook = async (req, res, next) => {
       order.status = 'Processing';
     }
 
-    // Add to timeline
+    // Map webhook status updates to customer-friendly timeline labels
+    let timelineStatus = 'Processing';
+    let timelineNote = 'Shipment status updated.';
+    
+    if (shipStatus === 'shipped' || shipStatus === 'dispatched') {
+      timelineStatus = 'Shipped';
+      timelineNote = `Your package has been dispatched via ${order.courierName}. Tracking Number: ${order.trackingNumber}`;
+    } else if (shipStatus === 'delivered') {
+      timelineStatus = 'Delivered';
+      timelineNote = 'Your order has been delivered successfully! Thank you for shopping with us.';
+    } else if (shipStatus === 'cancelled' || shipStatus === 'return') {
+      timelineStatus = 'Cancelled';
+      timelineNote = 'Your order shipment was cancelled.';
+    } else if (shipStatus === 'pickup_scheduled' || shipStatus === 'pickup_generated') {
+      timelineStatus = 'Processing';
+      timelineNote = `Shipment label generated with ${order.courierName}. Awaiting carrier pickup.`;
+    } else if (shipStatus === 'out_for_delivery') {
+      timelineStatus = 'Shipped';
+      timelineNote = 'Your package is out for delivery today!';
+    } else {
+      // General transition update
+      timelineStatus = order.status;
+      const cleanEventName = payload.current_status ? payload.current_status.replace(/_/g, ' ') : 'In Transit';
+      timelineNote = `Shipment update: ${cleanEventName.charAt(0).toUpperCase() + cleanEventName.slice(1).toLowerCase()}.`;
+    }
+
     order.timeline.push({
-      status: payload.current_status || 'Update',
-      note: `Carrier: ${payload.courier_name || 'N/A'}. Details: ${payload.etd || payload.current_status_id || 'Status updated.'}`
+      status: timelineStatus,
+      note: timelineNote
     });
 
     await order.save();

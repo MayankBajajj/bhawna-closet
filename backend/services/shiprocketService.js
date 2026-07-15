@@ -97,7 +97,7 @@ export const syncOrderToShiprocket = async (orderId) => {
 
     const token = await getShiprocketToken();
     const address = parseAddressString(order.shippingAddress);
-    const pickupLocation = process.env.SHIPROCKET_PICKUP_LOCATION || "Bhawna Closet Gurgaon";
+    const pickupLocation = (process.env.SHIPROCKET_PICKUP_LOCATION || "Home").trim();
 
     const payload = {
       order_id: order._id.toString(),
@@ -157,11 +157,6 @@ export const syncOrderToShiprocket = async (orderId) => {
     order.shiprocketOrderId = data.order_id;
     order.shiprocketShipmentId = data.shipment_id;
     order.shiprocketSyncStatus = 'Synced';
-    
-    order.timeline.push({
-      status: 'ShippedSync',
-      note: `Order successfully registered in Shiprocket. Shipment ID: ${data.shipment_id}`
-    });
 
     await order.save();
     console.log(`Order ${order._id} successfully synced to Shiprocket.`);
@@ -172,13 +167,7 @@ export const syncOrderToShiprocket = async (orderId) => {
     // Update attempts and status
     await Order.findByIdAndUpdate(orderId, {
       $set: { shiprocketSyncStatus: 'Failed' },
-      $inc: { shiprocketSyncAttempts: 1 },
-      $push: {
-        timeline: {
-          status: 'ShippedSyncFailed',
-          note: `Sync attempt failed: ${error.message}`
-        }
-      }
+      $inc: { shiprocketSyncAttempts: 1 }
     });
 
     throw error;
