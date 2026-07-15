@@ -235,15 +235,20 @@ export default function Hero({ onExploreClick }) {
         }
         @media (max-width: 576px) {
           .hero-section {
-            padding: 3.5rem 0 2rem 0 !important;
+            padding: 1.25rem 0 1.5rem 0 !important;
           }
           .hero-container {
-            gap: 1.5rem !important;
+            gap: 1rem !important;
+          }
+          .hero-badge {
+            margin-bottom: 0.85rem !important;
+            padding: 0.35rem 0.75rem !important;
+            font-size: 0.75rem !important;
           }
           .hero-content h1 {
-            font-size: 2.1rem !important;
+            font-size: 1.9rem !important;
             line-height: 1.2 !important;
-            margin-bottom: 1.5rem !important;
+            margin-bottom: 0.85rem !important;
           }
           .hero-description {
             display: none !important;
@@ -252,11 +257,11 @@ export default function Hero({ onExploreClick }) {
             flex-direction: row !important;
             justify-content: center !important;
             gap: 0.75rem !important;
-            margin-bottom: 1.5rem !important;
+            margin-bottom: 1rem !important;
           }
           .hero-actions .btn {
-            padding: 0.75rem 1.25rem !important;
-            font-size: 0.85rem !important;
+            padding: 0.7rem 1.15rem !important;
+            font-size: 0.8rem !important;
             width: auto !important;
           }
           .hero-metrics {
@@ -273,21 +278,21 @@ export default function Hero({ onExploreClick }) {
             height: 25px !important;
           }
           .hero-main-image {
-            max-width: 290px !important;
-            height: 380px !important;
+            max-width: 270px !important;
+            height: 350px !important;
           }
           .floating-glass-card {
             left: -15px !important;
-            bottom: 40px !important;
-            padding: 0.5rem 0.75rem !important;
+            bottom: 30px !important;
+            padding: 0.4rem 0.65rem !important;
           }
           .floating-glass-card-2 {
             right: -15px !important;
-            top: 40px !important;
-            padding: 0.5rem 0.75rem !important;
+            top: 30px !important;
+            padding: 0.4rem 0.65rem !important;
           }
           .floating-emoji {
-            font-size: 1.1rem !important;
+            font-size: 1rem !important;
           }
         }
       `}</style>

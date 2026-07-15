@@ -461,15 +461,20 @@ Error generating stack: `+e.message+`
         }
         @media (max-width: 576px) {
           .hero-section {
-            padding: 3.5rem 0 2rem 0 !important;
+            padding: 1.25rem 0 1.5rem 0 !important;
           }
           .hero-container {
-            gap: 1.5rem !important;
+            gap: 1rem !important;
+          }
+          .hero-badge {
+            margin-bottom: 0.85rem !important;
+            padding: 0.35rem 0.75rem !important;
+            font-size: 0.75rem !important;
           }
           .hero-content h1 {
-            font-size: 2.1rem !important;
+            font-size: 1.9rem !important;
             line-height: 1.2 !important;
-            margin-bottom: 1.5rem !important;
+            margin-bottom: 0.85rem !important;
           }
           .hero-description {
             display: none !important;
@@ -478,11 +483,11 @@ Error generating stack: `+e.message+`
             flex-direction: row !important;
             justify-content: center !important;
             gap: 0.75rem !important;
-            margin-bottom: 1.5rem !important;
+            margin-bottom: 1rem !important;
           }
           .hero-actions .btn {
-            padding: 0.75rem 1.25rem !important;
-            font-size: 0.85rem !important;
+            padding: 0.7rem 1.15rem !important;
+            font-size: 0.8rem !important;
             width: auto !important;
           }
           .hero-metrics {
@@ -499,21 +504,21 @@ Error generating stack: `+e.message+`
             height: 25px !important;
           }
           .hero-main-image {
-            max-width: 290px !important;
-            height: 380px !important;
+            max-width: 270px !important;
+            height: 350px !important;
           }
           .floating-glass-card {
             left: -15px !important;
-            bottom: 40px !important;
-            padding: 0.5rem 0.75rem !important;
+            bottom: 30px !important;
+            padding: 0.4rem 0.65rem !important;
           }
           .floating-glass-card-2 {
             right: -15px !important;
-            top: 40px !important;
-            padding: 0.5rem 0.75rem !important;
+            top: 30px !important;
+            padding: 0.4rem 0.65rem !important;
           }
           .floating-emoji {
-            font-size: 1.1rem !important;
+            font-size: 1rem !important;
           }
         }
       `})]})}function Je({product:e,onSelectProduct:t}){let n=new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(e.price),r=e.discountPrice?new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(e.discountPrice):null;return(0,F.jsxs)(`div`,{className:`product-card animate-fade-in`,onClick:()=>t(e),children:[(0,F.jsxs)(`div`,{className:`product-image-container`,children:[(0,F.jsx)(`img`,{src:e.image,alt:e.name,className:`product-image`,loading:`lazy`}),(0,F.jsx)(`div`,{className:`product-hover-overlay`,children:(0,F.jsx)(`button`,{className:`overlay-action-btn`,title:`Quick View`,children:(0,F.jsx)(ge,{size:18})})}),(0,F.jsx)(`span`,{className:`product-category-badge badge badge-pink`,children:e.category})]}),(0,F.jsxs)(`div`,{className:`product-info`,children:[(0,F.jsx)(`h3`,{className:`product-name`,children:e.name}),(0,F.jsxs)(`div`,{className:`product-footer`,children:[(0,F.jsx)(`div`,{className:`product-price-container`,children:r?(0,F.jsxs)(F.Fragment,{children:[(0,F.jsx)(`span`,{className:`product-price`,children:r}),(0,F.jsx)(`span`,{className:`product-original-price-strike`,children:n})]}):(0,F.jsx)(`span`,{className:`product-price`,children:n})}),(0,F.jsx)(`span`,{className:`product-sizes`,children:e.sizes.map(e=>typeof e==`object`&&e.size?e.size:e).join(`, `)})]})]}),(0,F.jsx)(`style`,{children:`
@@ -648,8 +653,7 @@ Error generating stack: `+e.message+`
             font-size: 0.75rem !important;
           }
           .product-sizes {
-            font-size: 0.65rem !important;
-            padding: 0.1rem 0.3rem !important;
+            display: none !important;
           }
           .product-category-badge {
             font-size: 0.6rem !important;
@@ -1577,13 +1581,89 @@ Error generating stack: `+e.message+`
         @media (max-width: 992px) {
           .detail-grid {
             grid-template-columns: 1fr;
-            gap: 2.5rem;
+            gap: 2rem;
           }
           .main-image-box {
-            height: 420px;
+            height: 400px;
           }
           .info-section {
             padding: 2rem;
+          }
+        }
+        @media (max-width: 576px) {
+          .product-detail-view {
+            padding-top: 1rem !important;
+            padding-bottom: 1.5rem !important;
+          }
+          .back-link-btn {
+            margin-bottom: 1rem !important;
+            font-size: 0.85rem !important;
+          }
+          .detail-grid {
+            gap: 1.25rem !important;
+          }
+          .main-image-box {
+            height: 320px !important;
+          }
+          .thumbnail-card {
+            height: 70px !important;
+          }
+          .info-section {
+            padding: 1.25rem !important;
+          }
+          .info-category {
+            font-size: 0.75rem !important;
+          }
+          .info-title {
+            font-size: 1.6rem !important;
+            margin-bottom: 0.25rem !important;
+          }
+          .info-price-row {
+            margin-bottom: 1rem !important;
+          }
+          .price-tag, .discount-price {
+            font-size: 1.6rem !important;
+          }
+          .info-desc {
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 1rem !important;
+          }
+          .options-section {
+            margin-bottom: 1rem !important;
+          }
+          .options-section h4 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0.35rem !important;
+          }
+          .size-btn {
+            min-width: 38px !important;
+            height: 38px !important;
+            font-size: 0.8rem !important;
+          }
+          .color-btn {
+            padding: 0.35rem 0.85rem !important;
+            font-size: 0.75rem !important;
+          }
+          .stock-status-row {
+            margin-bottom: 1rem !important;
+          }
+          .stock-alert {
+            font-size: 0.75rem !important;
+            padding: 0.4rem 0.75rem !important;
+          }
+          .purchase-actions-row {
+            gap: 0.75rem !important;
+          }
+          .btn-add-to-cart {
+            padding: 0.75rem !important;
+            font-size: 0.9rem !important;
+            border-radius: 8px !important;
+          }
+          .btn-wishlist-toggle {
+            width: 44px !important;
+            height: 44px !important;
+            border-radius: 8px !important;
           }
         }
       `})]})}var nt={createOrder:async e=>await P(`/orders`,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify(e)},!1),getUserOrders:async()=>await P(`/orders`,{method:`GET`},!1)};function rt({onContinueShopping:e,onSelectProductBySlug:t}){let{user:n}=Le(),{cartItems:r,updateQuantity:i,removeFromCart:a,getCartTotal:o,clearCart:s}=Ve(),[c,l]=(0,_.useState)(`cart`),[u,d]=(0,_.useState)(!1),[f,p]=(0,_.useState)(``),[m,h]=(0,_.useState)(null),[g,v]=(0,_.useState)({name:n?n.name:``,phone:``,street:``,city:``,state:``,pincode:``,paymentMethod:`COD`}),y=o(),b=e=>{let{name:t,value:n}=e.target;if(t===`phone`){let e=n.replace(/\D/g,``);e.startsWith(`0`)&&(e=e.substring(1)),e.startsWith(`91`)&&e.length>10&&(e=e.substring(2)),e=e.slice(0,10),v(n=>({...n,[t]:e}))}else v(e=>({...e,[t]:n}))},x=async(e,t)=>{let n=e.productId._id||e.productId;try{await i(n,e.size,t)}catch(e){alert(e.message||`Failed to update quantity`)}},S=async e=>{await a(e.productId._id||e.productId,e.size)},C=()=>{if(!n){window.location.hash=`#login`;return}p(``),l(`checkout`)},w=()=>new Promise(e=>{if(window.Razorpay){e(!0);return}let t=document.createElement(`script`);t.src=`https://checkout.razorpay.com/v1/checkout.js`,t.onload=()=>e(!0),t.onerror=()=>e(!1),document.body.appendChild(t)});return(0,F.jsxs)(`main`,{className:`cart-view section animate-fade-in`,children:[(0,F.jsxs)(`div`,{className:`container`,children:[!n&&(0,F.jsxs)(`div`,{className:`empty-cart-card glass-card`,children:[(0,F.jsx)(be,{size:64,className:`empty-icon`}),(0,F.jsx)(`h2`,{children:`Login Required`}),(0,F.jsx)(`p`,{children:`Please log in to your account to manage your shopping cart and place orders.`}),(0,F.jsxs)(`button`,{className:`btn btn-primary`,onClick:()=>window.location.hash=`#login`,children:[`Log In Now `,(0,F.jsx)(D,{size:18})]})]}),n&&c===`success`&&m&&(0,F.jsxs)(`div`,{className:`checkout-success-card glass-card`,children:[(0,F.jsx)(`div`,{className:`success-icon-circle`,children:(0,F.jsx)(re,{size:44})}),(0,F.jsx)(`h2`,{children:`Order Placed Successfully!`}),(0,F.jsx)(`p`,{className:`success-sub`,children:`Thank you for shopping with Bhawna Closet. Your order is pending verification.`}),(0,F.jsxs)(`div`,{className:`order-details-box`,children:[(0,F.jsxs)(`div`,{className:`detail-row`,children:[(0,F.jsx)(`span`,{children:`Order ID:`}),(0,F.jsx)(`strong`,{style:{wordBreak:`break-all`},children:m._id})]}),(0,F.jsxs)(`div`,{className:`detail-row`,children:[(0,F.jsx)(`span`,{children:`Total Amount:`}),(0,F.jsx)(`strong`,{className:`pink-text`,children:new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(m.totalAmount)})]}),(0,F.jsxs)(`div`,{className:`detail-row`,children:[(0,F.jsx)(`span`,{children:`Payment Method:`}),(0,F.jsxs)(`strong`,{children:[m.paymentMethod,` (Pending Verification)`]})]}),(0,F.jsxs)(`div`,{className:`detail-row`,children:[(0,F.jsx)(`span`,{children:`Shipping Address:`}),(0,F.jsx)(`span`,{className:`address-text`,children:m.shippingAddress})]}),(0,F.jsxs)(`div`,{className:`detail-row`,children:[(0,F.jsx)(`span`,{children:`Order Status:`}),(0,F.jsx)(`span`,{className:`status-badge-pending`,children:`Pending Approval`})]})]}),(0,F.jsx)(`p`,{className:`status-note`,children:`Our admin will review your order. You can check the approval status in your Account History.`}),(0,F.jsxs)(`button`,{className:`btn btn-primary`,onClick:e,children:[`Continue Shopping `,(0,F.jsx)(D,{size:18})]})]}),n&&c!==`success`&&r.length===0&&(0,F.jsxs)(`div`,{className:`empty-cart-card glass-card`,children:[(0,F.jsx)(be,{size:52,className:`empty-icon`}),(0,F.jsx)(`h2`,{children:`Your Shopping Cart is Empty`}),(0,F.jsx)(`p`,{children:`You haven't added any gorgeous coordinates or elegant Sakura dresses to your bag yet.`}),(0,F.jsxs)(`button`,{className:`btn btn-primary`,onClick:e,children:[`Shop Collections `,(0,F.jsx)(D,{size:18})]})]}),n&&c===`cart`&&r.length>0&&(0,F.jsxs)(`div`,{className:`cart-content-wrapper`,children:[(0,F.jsxs)(`div`,{className:`cart-banner glass-card`,children:[(0,F.jsx)(`h1`,{children:`Your Shopping Cart`}),(0,F.jsx)(`p`,{children:`Review items in your shopping bag before submitting details.`})]}),(0,F.jsxs)(`div`,{className:`cart-grid`,children:[(0,F.jsx)(`div`,{className:`cart-items-panel`,children:r.map((e,n)=>{let r=e.productId;if(!r)return null;let i=r.discountPrice||r.price,a=new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(i),o=new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(i*e.quantity),s=r.sizes.find(t=>t.size===e.size),c=s?s.stock:0;return(0,F.jsxs)(`div`,{className:`cart-item-card glass-card`,children:[(0,F.jsx)(`div`,{className:`item-image-wrapper`,onClick:()=>t(r.slug),children:(0,F.jsx)(`img`,{src:r.image,alt:r.name,className:`item-image`})}),(0,F.jsxs)(`div`,{className:`item-details`,children:[(0,F.jsx)(`h3`,{className:`item-name`,onClick:()=>t(r.slug),children:r.name}),(0,F.jsxs)(`div`,{className:`item-meta`,children:[(0,F.jsxs)(`span`,{children:[`Size: `,(0,F.jsx)(`strong`,{children:e.size})]}),e.color&&(0,F.jsxs)(`span`,{children:[`Color: `,(0,F.jsx)(`strong`,{children:e.color})]}),(0,F.jsxs)(`span`,{children:[`SKU: `,r.sku]})]}),(0,F.jsxs)(`div`,{className:`item-price-info`,children:[(0,F.jsx)(`span`,{className:`single-price`,children:a}),(0,F.jsxs)(`span`,{className:`price-multiplier`,children:[`x `,e.quantity]})]})]}),(0,F.jsxs)(`div`,{className:`item-qty-controls`,children:[(0,F.jsx)(`button`,{className:`qty-btn`,onClick:()=>x(e,e.quantity-1),disabled:e.quantity<=1,children:(0,F.jsx)(fe,{size:14})}),(0,F.jsx)(`span`,{className:`qty-value`,children:e.quantity}),(0,F.jsx)(`button`,{className:`qty-btn`,onClick:()=>x(e,e.quantity+1),disabled:e.quantity>=c,children:(0,F.jsx)(he,{size:14})})]}),(0,F.jsxs)(`div`,{className:`item-total-col`,children:[(0,F.jsx)(`span`,{className:`subtotal-value`,children:o}),(0,F.jsx)(`button`,{className:`remove-item-btn`,onClick:()=>S(e),title:`Remove item`,children:(0,F.jsx)(we,{size:16})})]})]},`${r._id}-${e.size}-${n}`)})}),(0,F.jsxs)(`div`,{className:`cart-summary-panel glass-card`,children:[(0,F.jsx)(`h3`,{children:`Order Summary`}),(0,F.jsxs)(`div`,{className:`summary-rows`,children:[(0,F.jsxs)(`div`,{className:`summary-row`,children:[(0,F.jsx)(`span`,{children:`Subtotal`}),(0,F.jsx)(`span`,{children:new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(y)})]}),(0,F.jsxs)(`div`,{className:`summary-row`,children:[(0,F.jsx)(`span`,{children:`Shipping`}),(0,F.jsx)(`span`,{className:`shipping-value`,children:`Free Shipping`})]}),(0,F.jsxs)(`div`,{className:`summary-row divider`,children:[(0,F.jsx)(`span`,{children:`Estimated Total`}),(0,F.jsx)(`span`,{className:`total-value`,children:new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(y)})]})]}),(0,F.jsxs)(`div`,{className:`checkout-note`,children:[(0,F.jsx)(O,{size:16,className:`note-icon`}),(0,F.jsx)(`span`,{children:`Shipping is free! Click checkout to enter shipping address details.`})]}),(0,F.jsxs)(`button`,{className:`btn btn-primary btn-checkout`,onClick:C,children:[`Proceed to Checkout `,(0,F.jsx)(D,{size:18})]}),(0,F.jsx)(`button`,{className:`btn-continue-shopping-text`,onClick:e,children:`Or Continue Shopping`})]})]})]}),n&&c===`checkout`&&r.length>0&&(0,F.jsxs)(`div`,{className:`checkout-content-wrapper`,children:[(0,F.jsxs)(`button`,{className:`back-link-btn`,onClick:()=>l(`cart`),style:{marginBottom:`2rem`},children:[(0,F.jsx)(ne,{size:18}),` Back to Bag`]}),(0,F.jsxs)(`div`,{className:`cart-banner glass-card`,style:{marginBottom:`3rem`},children:[(0,F.jsx)(`h1`,{children:`Delivery & Payment Details`}),(0,F.jsx)(`p`,{children:`Please enter your shipping address and select a payment method.`})]}),f&&(0,F.jsxs)(`div`,{className:`order-error-alert`,children:[(0,F.jsx)(O,{size:18}),(0,F.jsx)(`span`,{children:f})]}),(0,F.jsxs)(`form`,{onSubmit:async e=>{if(e.preventDefault(),!g.name||!g.phone||!g.street||!g.city||!g.state||!g.pincode){p(`Please fill in all shipping details.`);return}if(g.phone.length!==10){p(`Please enter a valid 10-digit phone number.`);return}d(!0),p(``);let t=`${g.name}, Phone: ${g.phone}, Address: ${g.street}, ${g.city}, ${g.state} - ${g.pincode}`,i={items:r.map(e=>({productId:e.productId._id,quantity:e.quantity,price:e.productId.discountPrice||e.productId.price,size:e.size,color:e.color||``,name:e.productId.name})),totalAmount:y,shippingAddress:t,paymentMethod:g.paymentMethod};try{if(g.paymentMethod===`COD`)h((await nt.createOrder(i)).order),s(),l(`success`);else{if(!await w())throw Error(`Failed to load Razorpay SDK. Please check your internet connection.`);let e=await P(`/payments/razorpay/order`,{method:`POST`,body:JSON.stringify({items:i.items,totalAmount:i.totalAmount,shippingAddress:i.shippingAddress})},!1),t={key:`rzp_live_TDIymjqPZZxw53`,amount:e.amount,currency:e.currency,name:`Bhawna Closet`,description:`Secure Payment for your Order`,order_id:e.id,handler:async function(e){try{d(!0),p(`Verifying your payment, please do not close this window...`),h((await P(`/payments/razorpay/verify`,{method:`POST`,body:JSON.stringify({razorpay_order_id:e.razorpay_order_id,razorpay_payment_id:e.razorpay_payment_id,razorpay_signature:e.razorpay_signature,shippingDetails:{shippingAddress:i.shippingAddress,items:i.items}})},!1)).order),s(),l(`success`)}catch(e){p(e.message||`Payment verification failed. Please contact support.`)}finally{d(!1)}},prefill:{name:g.name,contact:g.phone,email:n.email},theme:{color:`#f0548a`},modal:{ondismiss:function(){d(!1),p(`Payment cancelled by user.`)}}},r=new window.Razorpay(t);r.on(`payment.failed`,function(e){p(`Payment failed: ${e.error.description||`Unknown error`}`),d(!1)}),r.open()}}catch(e){p(e.message||`Failed to place order. Please try again.`),d(!1)}},className:`checkout-grid`,children:[(0,F.jsxs)(`div`,{className:`checkout-form-panel glass-card`,children:[(0,F.jsx)(`h3`,{children:`Shipping Address`}),(0,F.jsxs)(`div`,{className:`form-row-double`,children:[(0,F.jsxs)(`div`,{className:`checkout-field`,children:[(0,F.jsx)(`label`,{htmlFor:`chk-name`,children:`Full Name`}),(0,F.jsx)(`input`,{id:`chk-name`,type:`text`,name:`name`,value:g.name,onChange:b,placeholder:`e.g. Bhawna Bajaj`,required:!0})]}),(0,F.jsxs)(`div`,{className:`checkout-field`,children:[(0,F.jsx)(`label`,{htmlFor:`chk-phone`,children:`Phone Number`}),(0,F.jsx)(`input`,{id:`chk-phone`,type:`tel`,name:`phone`,value:g.phone,onChange:b,placeholder:`10-digit mobile number`,required:!0})]})]}),(0,F.jsxs)(`div`,{className:`checkout-field`,children:[(0,F.jsx)(`label`,{htmlFor:`chk-street`,children:`Street Address & House/Flat No.`}),(0,F.jsx)(`input`,{id:`chk-street`,type:`text`,name:`street`,value:g.street,onChange:b,placeholder:`Apartment, building, street address`,required:!0})]}),(0,F.jsxs)(`div`,{className:`form-row-triple`,children:[(0,F.jsxs)(`div`,{className:`checkout-field`,children:[(0,F.jsx)(`label`,{htmlFor:`chk-city`,children:`City`}),(0,F.jsx)(`input`,{id:`chk-city`,type:`text`,name:`city`,value:g.city,onChange:b,placeholder:`Gurgaon`,required:!0})]}),(0,F.jsxs)(`div`,{className:`checkout-field`,children:[(0,F.jsx)(`label`,{htmlFor:`chk-state`,children:`State`}),(0,F.jsx)(`input`,{id:`chk-state`,type:`text`,name:`state`,value:g.state,onChange:b,placeholder:`Haryana`,required:!0})]}),(0,F.jsxs)(`div`,{className:`checkout-field`,children:[(0,F.jsx)(`label`,{htmlFor:`chk-pincode`,children:`Pin Code`}),(0,F.jsx)(`input`,{id:`chk-pincode`,type:`text`,name:`pincode`,value:g.pincode,onChange:b,placeholder:`122018`,required:!0})]})]}),(0,F.jsx)(`hr`,{className:`checkout-hr`}),(0,F.jsx)(`h3`,{children:`Payment Options`}),(0,F.jsxs)(`div`,{className:`payment-options-list`,children:[(0,F.jsxs)(`label`,{className:`payment-option-label ${g.paymentMethod===`COD`?`active-payment`:``}`,children:[(0,F.jsx)(`input`,{type:`radio`,name:`paymentMethod`,value:`COD`,checked:g.paymentMethod===`COD`,onChange:b}),(0,F.jsxs)(`div`,{className:`payment-label-text`,children:[(0,F.jsx)(`strong`,{children:`Cash on Delivery (COD)`}),(0,F.jsx)(`span`,{children:`Pay with cash when your outfit is delivered.`})]})]}),(0,F.jsxs)(`label`,{className:`payment-option-label ${g.paymentMethod===`Online`?`active-payment`:``}`,children:[(0,F.jsx)(`input`,{type:`radio`,name:`paymentMethod`,value:`Online`,checked:g.paymentMethod===`Online`,onChange:b}),(0,F.jsxs)(`div`,{className:`payment-label-text`,children:[(0,F.jsx)(`strong`,{children:`Online UPI / Card / NetBanking`}),(0,F.jsx)(`span`,{children:`Pay securely online via Razorpay.`})]})]})]})]}),(0,F.jsxs)(`div`,{className:`cart-summary-panel glass-card`,children:[(0,F.jsx)(`h3`,{children:`Summary & Items`}),(0,F.jsx)(`div`,{className:`checkout-items-preview-list`,children:r.map((e,t)=>(0,F.jsxs)(`div`,{className:`checkout-item-preview-row`,children:[(0,F.jsxs)(`span`,{className:`item-prev-name`,children:[e.productId.name,` (`,e.size,`)`]}),(0,F.jsxs)(`span`,{className:`item-prev-qty`,children:[`x`,e.quantity]}),(0,F.jsx)(`span`,{className:`item-prev-sub`,children:new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format((e.productId.discountPrice||e.productId.price)*e.quantity)})]},t))}),(0,F.jsx)(`hr`,{style:{border:`none`,borderTop:`1px solid var(--border-light)`,margin:`1.25rem 0`}}),(0,F.jsxs)(`div`,{className:`summary-rows`,style:{marginBottom:`1.5rem`},children:[(0,F.jsxs)(`div`,{className:`summary-row`,children:[(0,F.jsx)(`span`,{children:`Subtotal`}),(0,F.jsx)(`span`,{children:new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(y)})]}),(0,F.jsxs)(`div`,{className:`summary-row`,children:[(0,F.jsx)(`span`,{children:`Shipping`}),(0,F.jsx)(`span`,{className:`shipping-value`,children:`Free Shipping`})]}),(0,F.jsxs)(`div`,{className:`summary-row divider`,children:[(0,F.jsx)(`span`,{children:`Final Total`}),(0,F.jsx)(`span`,{className:`total-value`,children:new Intl.NumberFormat(`en-IN`,{style:`currency`,currency:`INR`,maximumFractionDigits:0}).format(y)})]})]}),(0,F.jsxs)(`button`,{type:`submit`,className:`btn btn-primary btn-checkout`,disabled:u,children:[u?`Submitting Order...`:g.paymentMethod===`COD`?`Place Order (COD)`:`Place Order`,` `,(0,F.jsx)(D,{size:18})]})]})]})]})]}),(0,F.jsx)(`style`,{children:`

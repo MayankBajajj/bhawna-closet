@@ -608,13 +608,89 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
         @media (max-width: 992px) {
           .detail-grid {
             grid-template-columns: 1fr;
-            gap: 2.5rem;
+            gap: 2rem;
           }
           .main-image-box {
-            height: 420px;
+            height: 400px;
           }
           .info-section {
             padding: 2rem;
+          }
+        }
+        @media (max-width: 576px) {
+          .product-detail-view {
+            padding-top: 1rem !important;
+            padding-bottom: 1.5rem !important;
+          }
+          .back-link-btn {
+            margin-bottom: 1rem !important;
+            font-size: 0.85rem !important;
+          }
+          .detail-grid {
+            gap: 1.25rem !important;
+          }
+          .main-image-box {
+            height: 320px !important;
+          }
+          .thumbnail-card {
+            height: 70px !important;
+          }
+          .info-section {
+            padding: 1.25rem !important;
+          }
+          .info-category {
+            font-size: 0.75rem !important;
+          }
+          .info-title {
+            font-size: 1.6rem !important;
+            margin-bottom: 0.25rem !important;
+          }
+          .info-price-row {
+            margin-bottom: 1rem !important;
+          }
+          .price-tag, .discount-price {
+            font-size: 1.6rem !important;
+          }
+          .info-desc {
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 1rem !important;
+          }
+          .options-section {
+            margin-bottom: 1rem !important;
+          }
+          .options-section h4 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0.35rem !important;
+          }
+          .size-btn {
+            min-width: 38px !important;
+            height: 38px !important;
+            font-size: 0.8rem !important;
+          }
+          .color-btn {
+            padding: 0.35rem 0.85rem !important;
+            font-size: 0.75rem !important;
+          }
+          .stock-status-row {
+            margin-bottom: 1rem !important;
+          }
+          .stock-alert {
+            font-size: 0.75rem !important;
+            padding: 0.4rem 0.75rem !important;
+          }
+          .purchase-actions-row {
+            gap: 0.75rem !important;
+          }
+          .btn-add-to-cart {
+            padding: 0.75rem !important;
+            font-size: 0.9rem !important;
+            border-radius: 8px !important;
+          }
+          .btn-wishlist-toggle {
+            width: 44px !important;
+            height: 44px !important;
+            border-radius: 8px !important;
           }
         }
       `}</style>

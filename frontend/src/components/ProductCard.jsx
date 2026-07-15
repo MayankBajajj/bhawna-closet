@@ -190,8 +190,7 @@ export default function ProductCard({ product, onSelectProduct }) {
             font-size: 0.75rem !important;
           }
           .product-sizes {
-            font-size: 0.65rem !important;
-            padding: 0.1rem 0.3rem !important;
+            display: none !important;
           }
           .product-category-badge {
             font-size: 0.6rem !important;
