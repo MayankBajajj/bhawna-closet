@@ -169,7 +169,6 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
           <div className="info-section glass-card">
             <span className="info-category">{product.category}</span>
             <h1 className="info-title">{product.name}</h1>
-            <span className="info-sku">SKU: {product.sku}</span>
             {product.brand && <span className="info-brand">Brand: {product.brand}</span>}
 
             <div className="info-price-row">

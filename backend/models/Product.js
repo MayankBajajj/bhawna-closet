@@ -14,13 +14,6 @@ const sizeStockSchema = new mongoose.Schema({
 }, { _id: false });
 
 const productSchema = new mongoose.Schema({
-  sku: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    index: true
-  },
   slug: {
     type: String,
     unique: true,

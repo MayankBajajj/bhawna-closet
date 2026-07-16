@@ -30,7 +30,6 @@ export default function AdminDashboard() {
   const [formSubmitting, setFormSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    sku: '',
     name: '',
     brand: '',
     description: '',
@@ -197,7 +196,6 @@ export default function AdminDashboard() {
     setFormError('');
     setFormSuccess(false);
     setFormData({
-      sku: '',
       name: '',
       brand: '',
       description: '',
@@ -221,7 +219,6 @@ export default function AdminDashboard() {
     setFormError('');
     setFormSuccess(false);
     setFormData({
-      sku: product.sku,
       name: product.name,
       brand: product.brand || '',
       description: product.description,
@@ -283,7 +280,6 @@ export default function AdminDashboard() {
 
     try {
       const payload = new FormData();
-      payload.append('sku', formData.sku.trim());
       payload.append('name', formData.name.trim());
       payload.append('brand', formData.brand.trim());
       payload.append('description', formData.description.trim());
@@ -444,7 +440,6 @@ export default function AdminDashboard() {
                         <thead>
                           <tr>
                             <th>Product Name</th>
-                            <th>SKU</th>
                             <th>Size Stocks</th>
                           </tr>
                         </thead>
@@ -452,7 +447,6 @@ export default function AdminDashboard() {
                           {stats.lowStockProducts.map(prod => (
                             <tr key={prod._id}>
                               <td className="font-semibold">{prod.name}</td>
-                              <td><code className="sku-code">{prod.sku}</code></td>
                               <td>
                                 <div className="stock-badges-row">
                                   {prod.sizes.map(sz => (
@@ -486,7 +480,7 @@ export default function AdminDashboard() {
                 <Search size={18} className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Search products by name/SKU..."
+                  placeholder="Search products by name..."
                   value={productsSearch}
                   onChange={(e) => setProductsSearch(e.target.value)}
                 />
@@ -518,7 +512,6 @@ export default function AdminDashboard() {
                       <tr>
                         <th>Image</th>
                         <th>Name</th>
-                        <th>SKU</th>
                         <th>Category</th>
                         <th>Price</th>
                         <th>Size Stocks</th>
@@ -540,7 +533,6 @@ export default function AdminDashboard() {
                               </div>
                             </div>
                           </td>
-                          <td><code className="sku-code">{prod.sku}</code></td>
                           <td>{prod.category}</td>
                           <td>
                             {prod.discountPrice ? (
@@ -642,17 +634,7 @@ export default function AdminDashboard() {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label>SKU Code *</label>
-                    <input
-                      type="text"
-                      name="sku"
-                      value={formData.sku}
-                      onChange={handleFormChange}
-                      placeholder="e.g. BC-DRESS-BLOSSOM"
-                      required
-                    />
-                  </div>
+
                 </div>
 
                 <div className="form-fields-grid">
