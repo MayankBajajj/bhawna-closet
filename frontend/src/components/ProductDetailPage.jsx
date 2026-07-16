@@ -137,7 +137,48 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
   const imagesList = product.images && product.images.length > 0 ? product.images : [product.image];
 
   return (
-    <main className="product-detail-view section animate-fade-in">
+    <>
+      {/* Lightbox Fullscreen Photo Gallery Overlay */}
+      {isLightboxOpen && (
+        <div className="image-lightbox-overlay" onClick={() => setIsLightboxOpen(false)}>
+          <button className="lightbox-close-btn" onClick={() => setIsLightboxOpen(false)}>
+            &times;
+          </button>
+          
+          {imagesList.length > 1 && (
+            <button 
+              className="lightbox-nav-btn prev-btn" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIndex((prev) => (prev === 0 ? imagesList.length - 1 : prev - 1));
+              }}
+            >
+              &#10094;
+            </button>
+          )}
+          
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={imagesList[lightboxIndex]} alt={`${product.name} full view`} className="lightbox-image" />
+            <div className="lightbox-counter">
+              {lightboxIndex + 1} / {imagesList.length}
+            </div>
+          </div>
+          
+          {imagesList.length > 1 && (
+            <button 
+              className="lightbox-nav-btn next-btn" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIndex((prev) => (prev === imagesList.length - 1 ? 0 : prev + 1));
+              }}
+            >
+              &#10095;
+            </button>
+          )}
+        </div>
+      )}
+
+      <main className="product-detail-view section animate-fade-in">
       <div className="container">
         {/* Back Button Link */}
         <button className="back-link-btn" onClick={onBack}>
@@ -305,46 +346,6 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
           </section>
         )}
       </div>
-
-      {/* Lightbox Fullscreen Photo Gallery Overlay */}
-      {isLightboxOpen && (
-        <div className="image-lightbox-overlay" onClick={() => setIsLightboxOpen(false)}>
-          <button className="lightbox-close-btn" onClick={() => setIsLightboxOpen(false)}>
-            &times;
-          </button>
-          
-          {imagesList.length > 1 && (
-            <button 
-              className="lightbox-nav-btn prev-btn" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setLightboxIndex((prev) => (prev === 0 ? imagesList.length - 1 : prev - 1));
-              }}
-            >
-              &#10094;
-            </button>
-          )}
-          
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <img src={imagesList[lightboxIndex]} alt={`${product.name} full view`} className="lightbox-image" />
-            <div className="lightbox-counter">
-              {lightboxIndex + 1} / {imagesList.length}
-            </div>
-          </div>
-          
-          {imagesList.length > 1 && (
-            <button 
-              className="lightbox-nav-btn next-btn" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setLightboxIndex((prev) => (prev === imagesList.length - 1 ? 0 : prev + 1));
-              }}
-            >
-              &#10095;
-            </button>
-          )}
-        </div>
-      )}
 
       <style>{`
         .detail-loading-container {
@@ -746,7 +747,7 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.95);
+          background: var(--pure-white);
           z-index: 99999;
           display: flex;
           align-items: center;
@@ -758,7 +759,7 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
           top: 25px;
           right: 30px;
           background: transparent;
-          color: #fff;
+          color: var(--dark-charcoal);
           border: none;
           font-size: 3.5rem;
           line-height: 1;
@@ -771,8 +772,8 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
         }
         .lightbox-nav-btn {
           position: absolute;
-          background: rgba(255, 255, 255, 0.1);
-          color: #fff;
+          background: rgba(0, 0, 0, 0.05);
+          color: var(--dark-charcoal);
           border: none;
           width: 60px;
           height: 60px;
@@ -787,6 +788,7 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
         }
         .lightbox-nav-btn:hover {
           background: var(--primary-pink);
+          color: #fff;
           transform: scale(1.08);
         }
         .prev-btn {
@@ -809,10 +811,10 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
           max-height: 75vh;
           object-fit: contain;
           border-radius: 8px;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.1);
         }
         .lightbox-counter {
-          color: #aaa;
+          color: var(--text-muted);
           font-size: 0.95rem;
           margin-top: 1.25rem;
           font-weight: 500;
@@ -838,5 +840,6 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
         }
       `}</style>
     </main>
-  );
+  </>
+);
 }
