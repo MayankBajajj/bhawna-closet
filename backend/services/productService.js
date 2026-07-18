@@ -8,9 +8,40 @@ export const getProductsService = async ({ page = 1, limit = 12, category, searc
   }
 
   if (search) {
+    const cleanedSearch = search.trim();
+    const searchTerms = [cleanedSearch];
+
+    // Normalize plurals and singulars
+    if (cleanedSearch.toLowerCase().endsWith('es')) {
+      searchTerms.push(cleanedSearch.slice(0, -2));
+    } else if (cleanedSearch.toLowerCase().endsWith('s')) {
+      searchTerms.push(cleanedSearch.slice(0, -1));
+    }
+
+    if (cleanedSearch.toLowerCase().endsWith('dress')) {
+      searchTerms.push(cleanedSearch + 'es');
+    } else if (cleanedSearch.toLowerCase().endsWith('set') || cleanedSearch.toLowerCase().endsWith('top') || cleanedSearch.toLowerCase().endsWith('bottom')) {
+      searchTerms.push(cleanedSearch + 's');
+    }
+
+    // Support cordset variations
+    const normalized = cleanedSearch.toLowerCase().replace(/\s+/g, '');
+    if (normalized.includes('cordset') || normalized.includes('cordsets') || normalized.includes('coordset') || normalized.includes('coordsets')) {
+      searchTerms.push('cordset', 'cordsets', 'cord set', 'cord sets', 'co-ord', 'co-ord set', 'co-ord sets', 'coord set', 'coord sets');
+    }
+
+    // Extract unique terms
+    const uniqueTerms = Array.from(new Set(searchTerms));
+
+    // Escape regex characters and join with OR operator
+    const regexPattern = uniqueTerms
+      .map(term => term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
+      .join('|');
+
     query.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } }
+      { name: { $regex: regexPattern, $options: 'i' } },
+      { description: { $regex: regexPattern, $options: 'i' } },
+      { category: { $regex: regexPattern, $options: 'i' } }
     ];
   }
 
