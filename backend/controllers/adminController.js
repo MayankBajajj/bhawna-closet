@@ -65,15 +65,15 @@ export const getDashboardStats = async (req, res, next) => {
 
 export const createProduct = async (req, res, next) => {
   try {
-    const { sku, name, brand, description, price, discountPrice, category, sizes, colors, isFeatured, isNewArrival } = req.body;
+    const { name, brand, description, price, discountPrice, category, sizes, colors, isFeatured, isNewArrival } = req.body;
 
     // files will be parsed by multer-storage-cloudinary or multer.diskStorage
     const images = req.files ? req.files.map(f => {
       return isCloudinaryConfigured ? f.path : `${req.protocol}://${req.get('host')}/uploads/${f.filename}`;
     }) : [];
 
-    if (!sku || !name || !description || !price || !category) {
-      return res.status(400).json({ message: 'Required fields: SKU, Name, Description, Price, Category' });
+    if (!name || !description || !price || !category) {
+      return res.status(400).json({ message: 'Required fields: Name, Description, Price, Category' });
     }
 
     if (images.length === 0) {
@@ -96,7 +96,6 @@ export const createProduct = async (req, res, next) => {
     }
 
     const product = await createProductService({
-      sku,
       name,
       brand,
       description,
@@ -126,18 +125,34 @@ export const createProduct = async (req, res, next) => {
 export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { sku, name, brand, description, price, discountPrice, category, sizes, colors, isFeatured, isNewArrival, existingImages } = req.body;
+    const { name, brand, description, price, discountPrice, category, sizes, colors, isFeatured, isNewArrival, existingImages, imageOrder } = req.body;
 
     const newImages = req.files ? req.files.map(f => {
       return isCloudinaryConfigured ? f.path : `${req.protocol}://${req.get('host')}/uploads/${f.filename}`;
     }) : [];
 
-    let parsedExistingImages = [];
-    if (existingImages) {
-      parsedExistingImages = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+    let finalImages = [];
+    if (imageOrder) {
+      const order = typeof imageOrder === 'string' ? JSON.parse(imageOrder) : imageOrder;
+      let newImgIdx = 0;
+      order.forEach(item => {
+        if (item.type === 'existing') {
+          finalImages.push(item.url);
+        } else if (item.type === 'new') {
+          const fileUrl = newImages[newImgIdx];
+          if (fileUrl) {
+            finalImages.push(fileUrl);
+            newImgIdx++;
+          }
+        }
+      });
+    } else {
+      let parsedExistingImages = [];
+      if (existingImages) {
+        parsedExistingImages = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+      }
+      finalImages = [...parsedExistingImages, ...newImages];
     }
-
-    const finalImages = [...parsedExistingImages, ...newImages];
 
     if (finalImages.length === 0) {
       return res.status(400).json({ message: 'At least one product image is required' });
@@ -158,7 +173,6 @@ export const updateProduct = async (req, res, next) => {
     }
 
     const product = await updateProductService(id, {
-      sku,
       name,
       brand,
       description,

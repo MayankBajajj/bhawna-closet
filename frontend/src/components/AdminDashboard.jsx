@@ -52,10 +52,9 @@ export default function AdminDashboard() {
   const [colorsList, setColorsList] = useState([]);
   const [colorInput, setColorInput] = useState('');
 
-  // Image files state
-  const [imageFiles, setImageFiles] = useState([]); // File objects
-  const [imagePreviews, setImagePreviews] = useState([]); // object URLs for new files
-  const [existingImages, setExistingImages] = useState([]); // URLs from database
+  // Image state (unified to support drag-and-drop reordering)
+  const [formImages, setFormImages] = useState([]); // Array of { id, type: 'existing' | 'new', url, file: File | null }
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
   const categoriesList = ['Cordsets', 'Dresses', 'Tops & Shirts', 'Bottoms'];
 
@@ -165,29 +164,51 @@ export default function AdminDashboard() {
   const handleImageFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     
-    // Check total limit (existing + new files already picked + new selection)
-    const totalCount = existingImages.length + imageFiles.length + selectedFiles.length;
+    // Check total limit
+    const totalCount = formImages.length + selectedFiles.length;
     if (totalCount > 4) {
       setFormError('A product can support a maximum of 4 images');
       return;
     }
 
     setFormError('');
-    setImageFiles(prev => [...prev, ...selectedFiles]);
-
-    // Create object URLs for preview
-    const newPreviews = selectedFiles.map(file => URL.createObjectURL(file));
-    setImagePreviews(prev => [...prev, ...newPreviews]);
+    const newItems = selectedFiles.map((file, idx) => ({
+      id: `new-${Date.now()}-${idx}-${Math.random()}`,
+      type: 'new',
+      url: URL.createObjectURL(file),
+      file
+    }));
+    setFormImages(prev => [...prev, ...newItems]);
   };
 
-  const handleRemoveNewImage = (idxToRemove) => {
-    setImageFiles(imageFiles.filter((_, idx) => idx !== idxToRemove));
-    URL.revokeObjectURL(imagePreviews[idxToRemove]);
-    setImagePreviews(imagePreviews.filter((_, idx) => idx !== idxToRemove));
+  const handleRemoveImage = (itemToRemove) => {
+    if (itemToRemove.type === 'new') {
+      URL.revokeObjectURL(itemToRemove.url);
+    }
+    setFormImages(prev => prev.filter(item => item.id !== itemToRemove.id));
   };
 
-  const handleRemoveExistingImage = (urlToRemove) => {
-    setExistingImages(existingImages.filter(url => url !== urlToRemove));
+  // Drag and Drop handlers for reordering image files/previews
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    
+    const list = [...formImages];
+    const draggedItem = list[draggedIndex];
+    list.splice(draggedIndex, 1);
+    list.splice(index, 0, draggedItem);
+    
+    setDraggedIndex(index);
+    setFormImages(list);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
   };
 
   const openAddForm = () => {
@@ -207,9 +228,7 @@ export default function AdminDashboard() {
     });
     setSizeStock({ M: 0, L: 0, XL: 0, XXL: 0 });
     setColorsList([]);
-    setImageFiles([]);
-    setImagePreviews([]);
-    setExistingImages([]);
+    setFormImages([]);
     setActiveSubTab('form');
   };
 
@@ -237,9 +256,13 @@ export default function AdminDashboard() {
     setSizeStock(stockMap);
 
     setColorsList(product.colors || []);
-    setImageFiles([]);
-    setImagePreviews([]);
-    setExistingImages(product.images || [product.image]);
+    const productImages = product.images && product.images.length > 0 ? product.images : [product.image];
+    setFormImages(productImages.map((url, idx) => ({
+      id: `existing-${idx}-${url}`,
+      type: 'existing',
+      url,
+      file: null
+    })));
     setActiveSubTab('form');
   };
 
@@ -261,7 +284,7 @@ export default function AdminDashboard() {
     setFormError('');
     setFormSuccess(false);
 
-    const totalImages = existingImages.length + imageFiles.length;
+    const totalImages = formImages.length;
     if (totalImages === 0) {
       setFormError('At least one product image is required');
       return;
@@ -302,14 +325,25 @@ export default function AdminDashboard() {
       // Colors
       payload.append('colors', JSON.stringify(colorsList));
 
-      // Existing images to keep (for updates)
+      // Existing images to keep (for updates) in the correct sorted order
+      const existingImagesToKeep = formImages
+        .filter(img => img.type === 'existing')
+        .map(img => img.url);
+
       if (editMode) {
-        payload.append('existingImages', JSON.stringify(existingImages));
+        payload.append('existingImages', JSON.stringify(existingImagesToKeep));
+        
+        // Also send the drag reordered combined imageOrder specification array
+        const imageOrder = formImages.map(img => ({
+          type: img.type,
+          url: img.type === 'existing' ? img.url : undefined
+        }));
+        payload.append('imageOrder', JSON.stringify(imageOrder));
       }
 
-      // Append new files
-      imageFiles.forEach(file => {
-        payload.append('images', file);
+      // Append new files in their dragged order
+      formImages.filter(img => img.type === 'new').forEach(img => {
+        payload.append('images', img.file);
       });
 
       if (editMode) {
@@ -772,7 +806,7 @@ export default function AdminDashboard() {
                 {/* Images Upload Section */}
                 <div className="images-uploader-section">
                   <h4>Product Images (Max 4) *</h4>
-                  <p className="section-note">Choose files to upload to Cloudinary. Accepted formats: JPG, PNG, WEBP.</p>
+                  <p className="section-note">Choose files to upload. Accepted formats: JPG, PNG, WEBP. Drag images to rearrange their display order.</p>
 
                   <div className="uploader-picker-row">
                     <label className="picker-btn btn btn-outline">
@@ -782,35 +816,33 @@ export default function AdminDashboard() {
                         accept="image/*"
                         multiple
                         onChange={handleImageFileChange}
-                        disabled={existingImages.length + imageFiles.length >= 4}
+                        disabled={formImages.length >= 4}
                         style={{ display: 'none' }}
                       />
                     </label>
                     <span className="total-images-counter">
-                      Selected: {existingImages.length + imageFiles.length} of 4
+                      Selected: {formImages.length} of 4
                     </span>
                   </div>
 
-                  {/* Previews grid */}
-                  {(existingImages.length > 0 || imagePreviews.length > 0) && (
+                  {/* Previews grid with Drag & Drop reordering support */}
+                  {formImages.length > 0 && (
                     <div className="form-previews-grid">
-                      {/* Existing image previews */}
-                      {existingImages.map((url, idx) => (
-                        <div key={`existing-${idx}`} className="form-preview-card glass-card">
-                          <img src={url} alt="existing preview" className="preview-img" />
-                          <span className="preview-label existing">Cloud</span>
-                          <button type="button" className="remove-preview-btn" onClick={() => handleRemoveExistingImage(url)}>
-                            <X size={16} />
-                          </button>
-                        </div>
-                      ))}
-
-                      {/* New files previews */}
-                      {imagePreviews.map((url, idx) => (
-                        <div key={`new-${idx}`} className="form-preview-card glass-card">
-                          <img src={url} alt="new upload preview" className="preview-img" />
-                          <span className="preview-label local">Local</span>
-                          <button type="button" className="remove-preview-btn" onClick={() => handleRemoveNewImage(idx)}>
+                      {formImages.map((item, idx) => (
+                        <div
+                          key={item.id}
+                          className={`form-preview-card glass-card ${draggedIndex === idx ? 'dragging' : ''}`}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, idx)}
+                          onDragOver={(e) => handleDragOver(e, idx)}
+                          onDragEnd={handleDragEnd}
+                          title="Drag to reorder"
+                        >
+                          <img src={item.url} alt="product preview" className="preview-img" />
+                          <span className={`preview-label ${item.type === 'existing' ? 'existing' : 'local'}`}>
+                            {item.type === 'existing' ? 'Cloud' : 'Local'}
+                          </span>
+                          <button type="button" className="remove-preview-btn" onClick={() => handleRemoveImage(item)}>
                             <X size={16} />
                           </button>
                         </div>
@@ -1579,6 +1611,14 @@ export default function AdminDashboard() {
           height: 140px;
           overflow: hidden;
           background: var(--light-pink);
+          cursor: move;
+          transition: transform 0.15s ease, opacity 0.15s ease;
+          user-select: none;
+        }
+        .form-preview-card.dragging {
+          opacity: 0.5;
+          transform: scale(0.95);
+          border: 2px dashed var(--primary-pink) !important;
         }
         .preview-img {
           width: 100%;

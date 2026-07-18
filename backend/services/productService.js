@@ -48,11 +48,6 @@ export const getProductBySlugService = async (slug) => {
 };
 
 export const createProductService = async (productData) => {
-  // Check SKU uniqueness
-  const skuExists = await Product.findOne({ sku: productData.sku });
-  if (skuExists) {
-    throw new Error('Product with this SKU already exists');
-  }
   const product = new Product(productData);
   await product.save();
   return product;
@@ -62,13 +57,6 @@ export const updateProductService = async (id, updateData) => {
   const product = await Product.findOne({ _id: id, isDeleted: { $ne: true } });
   if (!product) {
     throw new Error('Product not found');
-  }
-  
-  if (updateData.sku && updateData.sku !== product.sku) {
-    const skuExists = await Product.findOne({ sku: updateData.sku });
-    if (skuExists) {
-      throw new Error('Product with this SKU already exists');
-    }
   }
 
   // Apply fields manually to trigger pre-save hooks (like slug generation)
