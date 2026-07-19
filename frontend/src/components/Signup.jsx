@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, Lock, ArrowRight, AlertTriangle, Eye, EyeOff, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { auth } from '../config/firebase';
@@ -6,6 +6,7 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
   const { signup } = useAuth();
+  const recaptchaRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -44,11 +45,12 @@ export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
       }
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      if (!recaptchaRef.current) {
+        throw new Error('reCAPTCHA container element not found');
+      }
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaRef.current, {
         size: 'invisible',
-        callback: () => {
-          // reCAPTCHA solved
-        },
+        callback: () => {},
         'expired-callback': () => {
           setErrorMsg('reCAPTCHA expired. Please try sending OTP again.');
         }
@@ -154,7 +156,7 @@ export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
     <div className="login-card glass-card animate-fade-in" style={{ maxWidth: '480px' }}>
       
       {/* Container for invisible Firebase reCAPTCHA */}
-      <div id="recaptcha-container"></div>
+      <div ref={recaptchaRef}></div>
 
       {!showOtpStep ? (
         <>

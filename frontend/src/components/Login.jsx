@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Lock, ArrowRight, AlertTriangle, Eye, EyeOff, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { request } from '../services/api';
@@ -7,6 +7,7 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 export default function Login({ onSwitchToSignup, onLoginSuccess }) {
   const { login, loginOtp, loginWithToken } = useAuth();
+  const recaptchaRef = useRef(null);
   
   // Views: 'login', 'forgot', 'reset'
   const [view, setView] = useState('login');
@@ -50,7 +51,10 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
       }
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      if (!recaptchaRef.current) {
+        throw new Error('reCAPTCHA container element not found');
+      }
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaRef.current, {
         size: 'invisible',
         callback: () => {},
         'expired-callback': () => {
@@ -206,7 +210,7 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
   if (view === 'forgot') {
     return (
       <div className="login-card glass-card animate-fade-in">
-        <div id="recaptcha-container"></div>
+        <div ref={recaptchaRef}></div>
 
         {!showOtpStep ? (
           <>
@@ -324,7 +328,7 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
     <div className="login-card glass-card animate-fade-in">
       
       {/* Invisible ReCAPTCHA Container */}
-      <div id="recaptcha-container"></div>
+      <div ref={recaptchaRef}></div>
 
       <div className="login-header">
         <h2>Welcome Back</h2>
