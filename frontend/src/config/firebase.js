@@ -4,12 +4,13 @@ import { getAuth } from 'firebase/auth';
 // Your web app's Firebase configuration
 // You can replace these placeholders with your actual Firebase config or add them to frontend/.env
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "YOUR_FIREBASE_API_KEY",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "YOUR_FIREBASE_AUTH_DOMAIN",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "YOUR_FIREBASE_PROJECT_ID",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "YOUR_FIREBASE_STORAGE_BUCKET",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "YOUR_FIREBASE_MESSAGING_SENDER_ID",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "YOUR_FIREBASE_APP_ID"
+  apiKey: "AIzaSyCW3kx5oYXNkjRXSjFz404HPjDby02hYkc",
+  authDomain: "bhawna-closet.firebaseapp.com",
+  projectId: "bhawna-closet",
+  storageBucket: "bhawna-closet.firebasestorage.app",
+  messagingSenderId: "450046441815",
+  appId: "1:450046441815:web:bb63f9e71b1dd3077ba612",
+  measurementId: "G-3R82TF3Z29"
 };
 
 const app = initializeApp(firebaseConfig);
