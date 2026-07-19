@@ -21,8 +21,8 @@ const fetchGooglePublicKeys = async () => {
     keysExpiryTime = now + 6 * 60 * 60 * 1000;
     return cachedKeys;
   } catch (err) {
-    console.error('Error fetching Google securetoken certs:', err.message);
-    throw new Error('Internal authentication service error');
+    console.error('Error fetching Google securetoken certs:', err);
+    throw new Error('Internal authentication service error: ' + err.message);
   }
 };
 
@@ -63,8 +63,8 @@ export const verifyFirebaseIdToken = async (token) => {
       },
       (err, decodedPayload) => {
         if (err) {
-          console.error('Firebase token verification error:', err.message);
-          return reject(new Error('Invalid or expired authentication token'));
+          console.error('Firebase token verification error:', err);
+          return reject(new Error('Invalid or expired authentication token: ' + err.message));
         }
         resolve(decodedPayload);
       }
