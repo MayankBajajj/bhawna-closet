@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Heart, ArrowLeft, Check, AlertCircle } from 'lucide-react';
+import { ShoppingBag, Heart, ArrowLeft, Check, AlertCircle, Ruler } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
@@ -16,6 +16,7 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [showSizeChart, setShowSizeChart] = useState(false);
   
   const [addingToCart, setAddingToCart] = useState(false);
   const [addedSuccess, setAddedSuccess] = useState(false);
@@ -236,7 +237,16 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
 
             {/* Sizing Section */}
             <div className="options-section">
-              <h4>Select Size</h4>
+              <div className="size-header-row">
+                <h4>Select Size</h4>
+                <button 
+                  type="button" 
+                  className="size-chart-btn"
+                  onClick={() => setShowSizeChart(true)}
+                >
+                  <Ruler size={16} /> Size Chart
+                </button>
+              </div>
               <div className="size-badges-list">
                 {['M', 'L', 'XL', 'XXL'].map((sz) => {
                   const szStock = product.sizes.find(s => s.size === sz);
@@ -838,8 +848,174 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
             max-height: 65vh;
           }
         }
+
+        .size-header-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 0.75rem;
+        }
+        .size-header-row h4 {
+          margin-bottom: 0;
+        }
+        .size-chart-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          background: none;
+          border: none;
+          color: var(--primary-pink-dark);
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          font-family: var(--font-sans);
+          padding: 2px 6px;
+          border-radius: 4px;
+          transition: all var(--transition-fast);
+        }
+        .size-chart-btn:hover {
+          color: var(--primary-pink-hover);
+          background: rgba(240, 84, 138, 0.08);
+          text-decoration: underline;
+        }
+
+        /* Size Chart Modal Overlay */
+        .size-chart-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(30, 34, 41, 0.55);
+          backdrop-filter: blur(4px);
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1.5rem;
+        }
+        .size-chart-modal {
+          width: 100%;
+          max-width: 440px;
+          background: var(--pure-white);
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+          position: relative;
+        }
+        .size-chart-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 0.75rem;
+          border-bottom: 1px solid var(--border-light);
+          padding-bottom: 0.75rem;
+        }
+        .size-chart-header h3 {
+          font-family: var(--font-serif);
+          font-size: 1.6rem;
+          color: var(--dark-charcoal);
+          margin: 0;
+        }
+        .size-chart-close-btn {
+          background: none;
+          border: none;
+          font-size: 1.8rem;
+          line-height: 1;
+          color: var(--text-muted);
+          cursor: pointer;
+          padding: 0 4px;
+        }
+        .size-chart-close-btn:hover {
+          color: var(--dark-charcoal);
+        }
+        .size-chart-intro {
+          font-size: 0.88rem;
+          color: var(--text-muted);
+          margin-bottom: 1.25rem;
+          line-height: 1.4;
+        }
+        .size-chart-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          background: var(--cream-white);
+          padding: 1.25rem;
+          border-radius: 12px;
+          border: 1px solid var(--border-light);
+          margin-bottom: 1.5rem;
+        }
+        .size-chart-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px dashed var(--border-light);
+        }
+        .size-chart-item:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+        .size-chart-name {
+          font-weight: 600;
+          font-size: 0.95rem;
+          color: var(--dark-charcoal);
+        }
+        .size-chart-val {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: var(--primary-pink-dark);
+        }
+        .btn-size-close {
+          width: 100%;
+          padding: 0.75rem;
+          border-radius: 10px;
+        }
       `}</style>
     </main>
+
+    {/* Size Chart Modal */}
+    {showSizeChart && (
+      <div className="size-chart-overlay animate-fade-in" onClick={() => setShowSizeChart(false)}>
+        <div className="size-chart-modal glass-card" onClick={(e) => e.stopPropagation()}>
+          <div className="size-chart-header">
+            <h3>Bust Size Guide</h3>
+            <button className="size-chart-close-btn" onClick={() => setShowSizeChart(false)}>
+              &times;
+            </button>
+          </div>
+          
+          <p className="size-chart-intro">
+            Standard bust size measurements to help you find your perfect fit:
+          </p>
+          
+          <div className="size-chart-list">
+            <div className="size-chart-item">
+              <span className="size-chart-name">Medium (M)</span>
+              <span className="size-chart-val">36 / 38 inches</span>
+            </div>
+            <div className="size-chart-item">
+              <span className="size-chart-name">Large (L)</span>
+              <span className="size-chart-val">40 inches</span>
+            </div>
+            <div className="size-chart-item">
+              <span className="size-chart-name">XL</span>
+              <span className="size-chart-val">42 inches</span>
+            </div>
+            <div className="size-chart-item">
+              <span className="size-chart-name">XXL</span>
+              <span className="size-chart-val">44 inches</span>
+            </div>
+          </div>
+          
+          <div className="size-chart-actions">
+            <button type="button" className="btn btn-primary btn-size-close" onClick={() => setShowSizeChart(false)}>
+              Close Size Guide
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   </>
 );
 }
