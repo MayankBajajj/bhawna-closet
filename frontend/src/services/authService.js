@@ -1,6 +1,13 @@
 import { request } from './api';
 
 export const authService = {
+  sendOtp: async (phone) => {
+    return await request('/auth/send-otp', {
+      method: 'POST',
+      body: JSON.stringify({ phone })
+    });
+  },
+
   login: async (phone, password) => {
     return await request('/auth/login', {
       method: 'POST',
@@ -8,17 +15,17 @@ export const authService = {
     });
   },
 
-  loginOtp: async (phone, firebaseToken) => {
+  loginOtp: async (phone, otp) => {
     return await request('/auth/login-otp', {
       method: 'POST',
-      body: JSON.stringify({ phone, firebaseToken })
+      body: JSON.stringify({ phone, otp })
     });
   },
 
-  register: async (name, phone, password, firebaseToken) => {
+  register: async (name, phone, password, otp) => {
     return await request('/auth/signup', {
       method: 'POST',
-      body: JSON.stringify({ name, phone, password, firebaseToken })
+      body: JSON.stringify({ name, phone, password, otp })
     });
   },
 

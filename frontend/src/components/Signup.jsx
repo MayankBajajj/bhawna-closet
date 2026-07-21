@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { User, Lock, ArrowRight, AlertTriangle, Eye, EyeOff, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { auth } from '../config/firebase';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { authService } from '../services/authService';
 
 export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
   const { signup } = useAuth();
-  const recaptchaRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -23,45 +21,12 @@ export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
   const [otpCode, setOtpCode] = useState('');
   const [sendingOtp, setSendingOtp] = useState(false);
 
-  useEffect(() => {
-    return () => {
-      if (window.recaptchaVerifier) {
-        try {
-          window.recaptchaVerifier.clear();
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    };
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const setupRecaptcha = () => {
-    try {
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-      }
-      if (!recaptchaRef.current) {
-        throw new Error('reCAPTCHA container element not found');
-      }
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaRef.current, {
-        size: 'invisible',
-        callback: () => {},
-        'expired-callback': () => {
-          setErrorMsg('reCAPTCHA expired. Please try sending OTP again.');
-        }
-      });
-    } catch (err) {
-      console.error('Error setting up reCAPTCHA verifier:', err);
-      setErrorMsg('Failed to initialize security verification. Please reload the page.');
-    }
-  };
-
-  // Step 1: Send SMS OTP
+  // Step 1: Request SMS OTP via Backend API
   const handleSendOtp = async (e) => {
     e.preventDefault();
     const { name, phone, password, confirmPassword } = formData;
@@ -81,34 +46,21 @@ export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
       return;
     }
 
-    // Format phone to E.164 (India default +91)
     let formattedPhone = phone.trim();
-    if (!formattedPhone.startsWith('+')) {
-      if (formattedPhone.length === 10) {
-        formattedPhone = `+91${formattedPhone}`;
-      } else {
-        setErrorMsg('Please enter a valid 10-digit phone number or specify country code (e.g., +91XXXXXXXXXX)');
-        return;
-      }
+    if (formattedPhone.length < 10) {
+      setErrorMsg('Please enter a valid 10-digit phone number');
+      return;
     }
 
     setSendingOtp(true);
     setErrorMsg('');
 
     try {
-      setupRecaptcha();
-      const confirmation = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
-      window.confirmationResult = confirmation;
+      await authService.sendOtp(formattedPhone);
       setShowOtpStep(true);
     } catch (err) {
-      console.error('Firebase SMS send error:', err);
-      if (err.code === 'auth/invalid-phone-number') {
-        setErrorMsg('The phone number entered is invalid.');
-      } else if (err.code === 'auth/too-many-requests') {
-        setErrorMsg('Too many requests. SMS delivery has been temporarily blocked for security reasons.');
-      } else {
-        setErrorMsg(err.message || 'Failed to send SMS OTP. Please try again.');
-      }
+      console.error('SMS send error:', err);
+      setErrorMsg(err.message || 'Failed to send SMS verification code. Please try again.');
     } finally {
       setSendingOtp(false);
     }
@@ -126,27 +78,14 @@ export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
     setErrorMsg('');
 
     try {
-      const confirmationResult = window.confirmationResult;
-      if (!confirmationResult) {
-        throw new Error('No active verification session. Please request OTP again.');
-      }
-      
-      const result = await confirmationResult.confirm(otpCode);
-      const idToken = await result.user.getIdToken();
-
-      // Register user on MongoDB backend
-      await signup(formData.name, result.user.phoneNumber, formData.password, idToken);
+      await signup(formData.name, formData.phone, formData.password, otpCode);
       
       if (onSignupSuccess) {
         onSignupSuccess();
       }
     } catch (err) {
       console.error('Verify OTP signup error:', err);
-      if (err.code === 'auth/invalid-verification-code') {
-        setErrorMsg('Incorrect verification code. Please check and try again.');
-      } else {
-        setErrorMsg(err.message || 'OTP verification failed. Please request a new code.');
-      }
+      setErrorMsg(err.message || 'Invalid or expired OTP code. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -155,9 +94,6 @@ export default function Signup({ onSwitchToLogin, onSignupSuccess }) {
   return (
     <div className="login-card glass-card animate-fade-in" style={{ maxWidth: '480px' }}>
       
-      {/* Container for invisible Firebase reCAPTCHA */}
-      <div ref={recaptchaRef}></div>
-
       {!showOtpStep ? (
         <>
           <div className="login-header">

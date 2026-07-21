@@ -58,10 +58,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginOtp = async (phone, firebaseToken) => {
+  const loginOtp = async (phone, otp) => {
     setLoading(true);
     try {
-      const data = await authService.loginOtp(phone, firebaseToken);
+      const data = await authService.loginOtp(phone, otp);
       localStorage.setItem('userToken', data.token);
       setUser({ _id: data._id, name: data.name, phone: data.phone });
       setLoading(false);
@@ -72,10 +72,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (name, phone, password, firebaseToken) => {
+  const signup = async (name, phone, password, otp) => {
     setLoading(true);
     try {
-      const data = await authService.register(name, phone, password, firebaseToken);
+      const data = await authService.register(name, phone, password, otp);
       localStorage.setItem('userToken', data.token);
       setUser({ _id: data._id, name: data.name, phone: data.phone });
       setLoading(false);

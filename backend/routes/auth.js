@@ -1,9 +1,10 @@
 import express from 'express';
-import { register, login, loginOtp, getProfile, updateProfile, changePassword, resetPassword } from '../controllers/authController.js';
+import { register, login, loginOtp, sendOtpController, getProfile, updateProfile, changePassword, resetPassword } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+router.post('/send-otp', sendOtpController);
 router.post('/signup', register);
 router.post('/login', login);
 router.post('/login-otp', loginOtp);

@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Lock, ArrowRight, AlertTriangle, Eye, EyeOff, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { authService } from '../services/authService';
 import { request } from '../services/api';
-import { auth } from '../config/firebase';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 export default function Login({ onSwitchToSignup, onLoginSuccess }) {
   const { login, loginOtp, loginWithToken } = useAuth();
-  const recaptchaRef = useRef(null);
   
-  // Views: 'login', 'forgot', 'reset'
+  // Views: 'login', 'forgot'
   const [view, setView] = useState('login');
   
   // loginMode: 'password' or 'otp'
@@ -21,7 +19,7 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Firebase Phone OTP Verification States (For OTP login or password reset)
+  // OTP Verification States (For OTP login or password reset)
   const [showOtpStep, setShowOtpStep] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [sendingOtp, setSendingOtp] = useState(false);
@@ -29,74 +27,30 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
   const [newPassword, setNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  useEffect(() => {
-    return () => {
-      if (window.recaptchaVerifier) {
-        try {
-          window.recaptchaVerifier.clear();
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    };
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const setupRecaptcha = () => {
-    try {
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-      }
-      if (!recaptchaRef.current) {
-        throw new Error('reCAPTCHA container element not found');
-      }
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaRef.current, {
-        size: 'invisible',
-        callback: () => {},
-        'expired-callback': () => {
-          setErrorMsg('reCAPTCHA expired. Please try sending OTP again.');
-        }
-      });
-    } catch (err) {
-      console.error('Error setting up reCAPTCHA verifier:', err);
-      setErrorMsg('Failed to initialize security verification. Please reload the page.');
+  // Helper to check phone format
+  const getTargetPhone = () => {
+    const raw = view === 'forgot' ? phoneForOtp : formData.phone;
+    const clean = raw ? raw.trim() : '';
+    if (!clean || clean.length < 10) {
+      throw new Error('Please enter a valid 10-digit phone number');
     }
+    return clean;
   };
 
-  // Helper to format phone to E.164
-  const formatPhoneNumber = (ph) => {
-    let formatted = ph.trim();
-    if (!formatted.startsWith('+')) {
-      if (formatted.length === 10) {
-        formatted = `+91${formatted}`;
-      } else {
-        throw new Error('Please enter a valid 10-digit phone number or specify country code (e.g. +91XXXXXXXXXX)');
-      }
-    }
-    return formatted;
-  };
-
-  // Send OTP for Login or Password Reset
+  // Send OTP for Login or Password Reset via Backend API
   const handleSendOtp = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setSendingOtp(true);
 
     try {
-      const targetPhone = view === 'forgot' ? phoneForOtp : formData.phone;
-      if (!targetPhone) {
-        throw new Error('Please enter your phone number');
-      }
-
-      const formatted = formatPhoneNumber(targetPhone);
-      setupRecaptcha();
-      
-      const confirmation = await signInWithPhoneNumber(auth, formatted, window.recaptchaVerifier);
-      window.confirmationResult = confirmation;
+      const targetPhone = getTargetPhone();
+      await authService.sendOtp(targetPhone);
       setShowOtpStep(true);
     } catch (err) {
       console.error(err);
@@ -118,12 +72,8 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
     setErrorMsg('');
 
     try {
-      const confirmationResult = window.confirmationResult;
-      const result = await confirmationResult.confirm(otpCode);
-      const idToken = await result.user.getIdToken();
-
-      // Login on backend via Firebase token verification
-      await loginOtp(result.user.phoneNumber, idToken);
+      const targetPhone = getTargetPhone();
+      await loginOtp(targetPhone, otpCode);
       
       if (onLoginSuccess) {
         onLoginSuccess();
@@ -171,17 +121,12 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
     setErrorMsg('');
 
     try {
-      const confirmationResult = window.confirmationResult;
-      const result = await confirmationResult.confirm(otpCode);
-      const idToken = await result.user.getIdToken();
-
-      // Reset password on backend using Firebase verification
       const response = await request('/auth/reset-password', {
         method: 'POST',
         body: JSON.stringify({
-          phone: result.user.phoneNumber,
+          phone: phoneForOtp,
           newPassword,
-          firebaseToken: idToken
+          otp: otpCode
         })
       });
       
@@ -210,8 +155,6 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
   if (view === 'forgot') {
     return (
       <div className="login-card glass-card animate-fade-in">
-        <div ref={recaptchaRef}></div>
-
         {!showOtpStep ? (
           <>
             <div className="login-header">
@@ -327,9 +270,6 @@ export default function Login({ onSwitchToSignup, onLoginSuccess }) {
   return (
     <div className="login-card glass-card animate-fade-in">
       
-      {/* Invisible ReCAPTCHA Container */}
-      <div ref={recaptchaRef}></div>
-
       <div className="login-header">
         <h2>Welcome Back</h2>
         <p>Login to your Bhawna Closet account using your phone number.</p>
