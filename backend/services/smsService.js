@@ -1,12 +1,11 @@
 /**
- * Sends an SMS OTP code to a user's phone number using the configured SMS gateway.
- * @param {string} phone - Target phone number (e.g., "+919876543210" or "9876543210")
+ * Sends an SMS OTP code to a user's phone number using the BlackSMS API.
+ * @param {string} phone - Target phone number (e.g., "+919560083880" or "9560083880")
  * @param {string} otp - 6-digit numeric OTP code
  */
 export const sendSmsOtp = async (phone, otp) => {
   const apiKey = process.env.BLACK_SMS_API_KEY || process.env.SMS_API_KEY;
-  const senderId = process.env.BLACK_SMS_SENDER_ID || 'BHAWNA';
-  const templateId = process.env.BLACK_SMS_TEMPLATE_ID || '';
+  const senderId = process.env.BLACK_SMS_SENDER_ID || '357';
 
   // Normalize phone number (extract 10-digit number for Indian gateways)
   let cleanPhone = phone.replace(/\D/g, '');
@@ -16,7 +15,7 @@ export const sendSmsOtp = async (phone, otp) => {
 
   const message = `${otp} is your verification code for Bhawna Closet. Valid for 5 minutes.`;
 
-  console.log(`[SMS SERVICE] Triggering OTP ${otp} for phone: ${cleanPhone}`);
+  console.log(`[BLACKSMS SERVICE] Triggering OTP ${otp} for phone: ${cleanPhone}`);
 
   // If no API key is set yet, print OTP in console for testing
   if (!apiKey || apiKey === 'YOUR_BLACK_SMS_API_KEY') {
@@ -27,47 +26,31 @@ export const sendSmsOtp = async (phone, otp) => {
   }
 
   try {
-    const customUrl = process.env.BLACK_SMS_URL;
-
-    if (customUrl) {
-      // Replace placeholders in custom API URL if provided
-      const finalUrl = customUrl
-        .replace('{API_KEY}', encodeURIComponent(apiKey))
-        .replace('{PHONE}', encodeURIComponent(cleanPhone))
-        .replace('{OTP}', encodeURIComponent(otp))
-        .replace('{MESSAGE}', encodeURIComponent(message))
-        .replace('{SENDER_ID}', encodeURIComponent(senderId))
-        .replace('{TEMPLATE_ID}', encodeURIComponent(templateId));
-
-      const response = await fetch(finalUrl);
-      const data = await response.json().catch(() => ({}));
-      console.log('[SMS GATEWAY RESPONSE]:', data);
-      return { success: true, data };
-    } else {
-      const bodyPayload = {
-        route: 'otp',
+    const response = await fetch('https://www.blacksms.in/sms', {
+      method: 'POST',
+      headers: {
+        'authorization': apiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        route: '1',
+        sender_id: senderId,
         variables_values: otp,
-        numbers: cleanPhone
-      };
-      if (senderId) {
-        bodyPayload.sender_id = senderId;
-      }
+        numbers: cleanPhone,
+        message: message
+      })
+    });
 
-      const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-        method: 'POST',
-        headers: {
-          'authorization': apiKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bodyPayload)
-      });
+    const data = await response.json().catch(() => ({}));
+    console.log('[BLACKSMS GATEWAY RESPONSE]:', data);
 
-      const data = await response.json();
-      console.log('[SMS GATEWAY RESPONSE]:', data);
-      return { success: true, data };
+    if (data.status === 0) {
+      throw new Error(data.message || 'SMS delivery failed');
     }
+
+    return { success: true, data };
   } catch (err) {
-    console.error('Error sending SMS via gateway:', err.message);
+    console.error('Error sending SMS via BlackSMS:', err.message);
     throw new Error('Failed to send SMS verification code: ' + err.message);
   }
 };
