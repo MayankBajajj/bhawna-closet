@@ -118,6 +118,7 @@ function AppContent() {
 
   const handleCategoryCardClick = (catName) => {
     setCategoryFilter(catName);
+    setSearchQuery('');
     setShopPage(1);
     setActiveTab('collections');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -125,6 +126,7 @@ function AppContent() {
 
   const handleExploreClick = () => {
     setCategoryFilter('All');
+    setSearchQuery('');
     setShopPage(1);
     setActiveTab('collections');
   };
@@ -304,7 +306,7 @@ function AppContent() {
                     <button
                       key={cat}
                       className={`filter-tab-btn ${categoryFilter === cat ? 'active' : ''}`}
-                      onClick={() => { setCategoryFilter(cat); setShopPage(1); }}
+                      onClick={() => { setCategoryFilter(cat); setSearchQuery(''); setShopPage(1); }}
                     >
                       {cat}
                     </button>
@@ -321,6 +323,16 @@ function AppContent() {
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); setShopPage(1); }}
                 />
+                {searchQuery && (
+                  <button 
+                    type="button" 
+                    className="clear-search-btn"
+                    onClick={() => { setSearchQuery(''); setShopPage(1); }}
+                    title="Clear search"
+                  >
+                    &times;
+                  </button>
+                )}
               </div>
 
               {/* Sort selector */}
@@ -342,12 +354,12 @@ function AppContent() {
             ) : shopProducts.length === 0 ? (
               <div className="empty-results-box glass-card">
                 <h3>No Outfits Found</h3>
-                <p>We couldn't find any products matching your selection. Try clearing your filters or search text.</p>
+                <p>We couldn't find any products matching <strong>"{searchQuery || categoryFilter}"</strong>. Click below to view all outfits.</p>
                 <button 
                   className="btn btn-primary"
                   onClick={() => { setCategoryFilter('All'); setSearchQuery(''); setShopPage(1); }}
                 >
-                  Clear Filters
+                  Clear Search &amp; View All
                 </button>
               </div>
             ) : (
@@ -787,6 +799,22 @@ function AppContent() {
         }
         .search-bar-wrapper input:focus {
           border-color: var(--primary-pink);
+        }
+        .clear-search-btn {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: var(--text-muted);
+          font-size: 1.25rem;
+          line-height: 1;
+          cursor: pointer;
+          padding: 2px;
+        }
+        .clear-search-btn:hover {
+          color: var(--primary-pink);
         }
         
         .sort-wrapper select {
