@@ -266,22 +266,54 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
               </div>
             </div>
 
-            {/* Colors Section */}
-            {product.colors && product.colors.length > 0 && (
+            {/* Color Variants Section (Linked Products) */}
+            {((product.colorName) || (product.colorVariants && product.colorVariants.length > 0)) ? (
               <div className="options-section">
                 <h4>Select Color</h4>
-                <div className="color-badges-list">
-                  {product.colors.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`color-btn ${selectedColor === color ? 'active-color' : ''}`}
-                    >
-                      {color}
-                    </button>
-                  ))}
+                <div className="color-variants-list">
+                  <div className="color-variant-item active-variant">
+                    {product.image && (
+                      <img src={product.image} className="color-variant-thumb" alt={product.colorName} />
+                    )}
+                    <span>{product.colorName || 'Default'}</span>
+                  </div>
+                  
+                  {product.colorVariants && product.colorVariants.map((variant) => {
+                    if (!variant.product) return null;
+                    return (
+                      <button
+                        key={variant.product._id || variant.product}
+                        onClick={() => onSelectProduct(variant.product)}
+                        className="color-variant-btn-link"
+                        title={`Switch to ${variant.colorName}`}
+                      >
+                        {variant.product.image && (
+                          <img src={variant.product.image} className="color-variant-thumb" alt={variant.colorName} />
+                        )}
+                        <span>{variant.colorName}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+            ) : (
+              /* Fallback to static colors if defined */
+              product.colors && product.colors.length > 0 && (
+                <div className="options-section">
+                  <h4>Select Color</h4>
+                  <div className="color-badges-list">
+                    {product.colors.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => setSelectedColor(color)}
+                        className={`color-btn ${selectedColor === color ? 'active-color' : ''}`}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )
             )}
 
             {/* Stock status indicator */}
@@ -583,6 +615,50 @@ export default function ProductDetailPage({ productSlug, onBack, onSelectProduct
           background: var(--light-pink);
           color: var(--primary-pink-dark);
           font-weight: 700;
+        }
+        
+        .color-variants-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          margin-top: 0.5rem;
+        }
+        .color-variant-thumb {
+          width: 24px;
+          height: 24px;
+          object-fit: cover;
+          border-radius: 4px;
+          margin-right: 0.5rem;
+          border: 1px solid var(--border-light);
+        }
+        .color-variant-item.active-variant {
+          display: inline-flex;
+          align-items: center;
+          background: var(--primary-pink);
+          border: 1.5px solid var(--primary-pink);
+          padding: 0.4rem 0.8rem;
+          border-radius: 8px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--pure-white);
+        }
+        .color-variant-btn-link {
+          display: inline-flex;
+          align-items: center;
+          background: var(--cream-white);
+          border: 1.5px solid var(--border-light);
+          padding: 0.4rem 0.8rem;
+          border-radius: 8px;
+          font-size: 0.85rem;
+          font-weight: 500;
+          color: var(--dark-charcoal);
+          cursor: pointer;
+          transition: all var(--transition-normal);
+        }
+        .color-variant-btn-link:hover {
+          border-color: var(--primary-pink);
+          color: var(--primary-pink);
+          background: var(--light-pink);
         }
         
         .stock-status-row {

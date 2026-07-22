@@ -87,6 +87,17 @@ const productSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  colorName: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  colorVariants: [
+    {
+      colorName: { type: String, required: true },
+      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true }
+    }
+  ],
   isFeatured: {
     type: Boolean,
     default: false,

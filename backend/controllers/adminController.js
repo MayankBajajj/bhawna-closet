@@ -65,7 +65,7 @@ export const getDashboardStats = async (req, res, next) => {
 
 export const createProduct = async (req, res, next) => {
   try {
-    const { name, brand, description, price, discountPrice, category, sizes, colors, isFeatured, isNewArrival } = req.body;
+    const { name, brand, description, price, discountPrice, category, sizes, colors, isFeatured, isNewArrival, colorName, colorVariants } = req.body;
 
     // files will be parsed by multer-storage-cloudinary or multer.diskStorage
     const images = req.files ? req.files.map(f => {
@@ -95,6 +95,11 @@ export const createProduct = async (req, res, next) => {
       parsedColors = JSON.parse(colors);
     }
 
+    let parsedColorVariants = [];
+    if (colorVariants) {
+      parsedColorVariants = typeof colorVariants === 'string' ? JSON.parse(colorVariants) : colorVariants;
+    }
+
     const product = await createProductService({
       name,
       brand,
@@ -104,10 +109,28 @@ export const createProduct = async (req, res, next) => {
       category,
       sizes: parsedSizes,
       colors: parsedColors || [],
+      colorName: colorName || '',
+      colorVariants: parsedColorVariants || [],
       images,
       isFeatured: isFeatured === 'true' || isFeatured === true,
       isNewArrival: isNewArrival === 'true' || isNewArrival === true
     });
+
+    // Automatically sync other products to link back to this product
+    if (parsedColorVariants && parsedColorVariants.length > 0) {
+      for (const variant of parsedColorVariants) {
+        if (variant.product) {
+          await Product.findByIdAndUpdate(variant.product, {
+            $addToSet: {
+              colorVariants: {
+                colorName: colorName || '',
+                product: product._id
+              }
+            }
+          });
+        }
+      }
+    }
 
     // Auto-seed category to Category database
     const categoryExists = await Category.findOne({ name: category });
@@ -125,7 +148,7 @@ export const createProduct = async (req, res, next) => {
 export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, brand, description, price, discountPrice, category, sizes, colors, isFeatured, isNewArrival, existingImages, imageOrder } = req.body;
+    const { name, brand, description, price, discountPrice, category, sizes, colors, isFeatured, isNewArrival, existingImages, imageOrder, colorName, colorVariants } = req.body;
 
     const newImages = req.files ? req.files.map(f => {
       return isCloudinaryConfigured ? f.path : `${req.protocol}://${req.get('host')}/uploads/${f.filename}`;
@@ -172,6 +195,11 @@ export const updateProduct = async (req, res, next) => {
       parsedColors = JSON.parse(colors);
     }
 
+    let parsedColorVariants = [];
+    if (colorVariants) {
+      parsedColorVariants = typeof colorVariants === 'string' ? JSON.parse(colorVariants) : colorVariants;
+    }
+
     const product = await updateProductService(id, {
       name,
       brand,
@@ -181,10 +209,33 @@ export const updateProduct = async (req, res, next) => {
       category,
       sizes: parsedSizes,
       colors: parsedColors || [],
+      colorName: colorName || '',
+      colorVariants: parsedColorVariants || [],
       images: finalImages,
       isFeatured: isFeatured === 'true' || isFeatured === true,
       isNewArrival: isNewArrival === 'true' || isNewArrival === true
     });
+
+    // Automatically sync other products to link back to this product symmetrically
+    await Product.updateMany(
+      { 'colorVariants.product': product._id },
+      { $pull: { colorVariants: { product: product._id } } }
+    );
+
+    if (parsedColorVariants && parsedColorVariants.length > 0) {
+      for (const variant of parsedColorVariants) {
+        if (variant.product) {
+          await Product.findByIdAndUpdate(variant.product, {
+            $addToSet: {
+              colorVariants: {
+                colorName: colorName || '',
+                product: product._id
+              }
+            }
+          });
+        }
+      }
+    }
 
     const categoryExists = await Category.findOne({ name: category });
     if (!categoryExists) {

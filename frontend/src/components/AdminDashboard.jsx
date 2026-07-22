@@ -52,6 +52,13 @@ export default function AdminDashboard() {
   const [colorsList, setColorsList] = useState([]);
   const [colorInput, setColorInput] = useState('');
 
+  // Color name & variants states
+  const [allProductsList, setAllProductsList] = useState([]);
+  const [colorName, setColorName] = useState('');
+  const [colorVariants, setColorVariants] = useState([]);
+  const [selectedVariantProduct, setSelectedVariantProduct] = useState('');
+  const [variantColorNameInput, setVariantColorNameInput] = useState('');
+
   // Image state (unified to support drag-and-drop reordering)
   const [formImages, setFormImages] = useState([]); // Array of { id, type: 'existing' | 'new', url, file: File | null }
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -87,6 +94,15 @@ export default function AdminDashboard() {
       console.error('Error fetching admin products list', err);
     } finally {
       setLoadingProducts(false);
+    }
+  };
+
+  const fetchAllProductsList = async () => {
+    try {
+      const data = await productService.getProducts({ page: 1, limit: 1000 });
+      setAllProductsList(data.products || []);
+    } catch (err) {
+      console.error('Error fetching all products list', err);
     }
   };
 
@@ -160,6 +176,36 @@ export default function AdminDashboard() {
     setColorsList(colorsList.filter(c => c !== colorToRemove));
   };
 
+  const handleAddColorVariant = () => {
+    if (!selectedVariantProduct) {
+      alert('Please select a product to link as a variant.');
+      return;
+    }
+    if (!variantColorNameInput.trim()) {
+      alert('Please specify the color name for this variant.');
+      return;
+    }
+
+    if (colorVariants.some(v => v.product === selectedVariantProduct)) {
+      alert('This product is already linked as a variant.');
+      return;
+    }
+
+    setColorVariants(prev => [
+      ...prev,
+      {
+        colorName: variantColorNameInput.trim(),
+        product: selectedVariantProduct
+      }
+    ]);
+    setSelectedVariantProduct('');
+    setVariantColorNameInput('');
+  };
+
+  const handleRemoveColorVariant = (index) => {
+    setColorVariants(prev => prev.filter((_, i) => i !== index));
+  };
+
   // Image upload pick handler
   const handleImageFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -228,6 +274,11 @@ export default function AdminDashboard() {
     });
     setSizeStock({ M: 0, L: 0, XL: 0, XXL: 0 });
     setColorsList([]);
+    setColorName('');
+    setColorVariants([]);
+    setSelectedVariantProduct('');
+    setVariantColorNameInput('');
+    fetchAllProductsList();
     setFormImages([]);
     setActiveSubTab('form');
   };
@@ -256,6 +307,17 @@ export default function AdminDashboard() {
     setSizeStock(stockMap);
 
     setColorsList(product.colors || []);
+    setColorName(product.colorName || '');
+    
+    const mappedVariants = product.colorVariants ? product.colorVariants.map(v => ({
+      colorName: v.colorName,
+      product: v.product?._id || v.product
+    })) : [];
+    setColorVariants(mappedVariants);
+    setSelectedVariantProduct('');
+    setVariantColorNameInput('');
+    fetchAllProductsList();
+
     const productImages = product.images && product.images.length > 0 ? product.images : [product.image];
     setFormImages(productImages.map((url, idx) => ({
       id: `existing-${idx}-${url}`,
@@ -324,6 +386,10 @@ export default function AdminDashboard() {
 
       // Colors
       payload.append('colors', JSON.stringify(colorsList));
+
+      // Color name & variants
+      payload.append('colorName', colorName.trim());
+      payload.append('colorVariants', JSON.stringify(colorVariants));
 
       // Existing images to keep (for updates) in the correct sorted order
       const existingImagesToKeep = formImages
@@ -755,27 +821,90 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Colors section */}
+                {/* Color Variants Section (Linked Products) */}
                 <div className="colors-input-section">
-                  <h4>Color Variants</h4>
-                  <p className="section-note">Type color and click add to insert color tags.</p>
-                  <div className="colors-adder-row">
+                  <h4>Color &amp; Linked Variants</h4>
+                  <p className="section-note">Define this product's color and link it to other color versions of the same dress/cordset design.</p>
+                  
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label style={{ fontWeight: 600, fontSize: '0.85rem', display: 'block', marginBottom: '0.35rem' }}>Color Name of This Product</label>
                     <input
                       type="text"
                       placeholder="e.g. Blush Pink"
-                      value={colorInput}
-                      onChange={(e) => setColorInput(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddColor(); } }}
+                      value={colorName}
+                      onChange={(e) => setColorName(e.target.value)}
+                      style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-light)' }}
                     />
-                    <button type="button" className="btn btn-outline" onClick={handleAddColor}>Add</button>
                   </div>
-                  {colorsList.length > 0 && (
-                    <div className="colors-chips-list">
-                      {colorsList.map(c => (
-                        <span key={c} className="color-chip">
-                          {c} <button type="button" onClick={() => handleRemoveColor(c)}><X size={12} /></button>
-                        </span>
-                      ))}
+
+                  <div className="variant-linking-box" style={{ background: 'rgba(0,0,0,0.02)', border: '1px dashed var(--border-light)', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
+                    <h5 style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', fontWeight: 600 }}>Link Another Product as a Color Variant</h5>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.75rem', alignItems: 'end' }}>
+                      <div className="form-group" style={{ margin: 0 }}>
+                        <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Select Product</label>
+                        <select
+                          value={selectedVariantProduct}
+                          onChange={(e) => setSelectedVariantProduct(e.target.value)}
+                          style={{ width: '100%', height: '40px', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-light)', background: '#fff', fontSize: '0.8rem' }}
+                        >
+                          <option value="">-- Choose Product --</option>
+                          {allProductsList
+                            .filter(p => p._id !== editProductId)
+                            .map(p => (
+                              <option key={p._id} value={p._id}>{p.name} ({p.slug})</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+
+                      <div className="form-group" style={{ margin: 0 }}>
+                        <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Color Name of Variant</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Pastel Green"
+                          value={variantColorNameInput}
+                          onChange={(e) => setVariantColorNameInput(e.target.value)}
+                          style={{ height: '40px', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-light)' }}
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={handleAddColorVariant}
+                        style={{ height: '40px', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        Link
+                      </button>
+                    </div>
+                  </div>
+
+                  {colorVariants.length > 0 && (
+                    <div className="linked-variants-list" style={{ marginTop: '0.75rem' }}>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '0.5rem' }}>Linked Color Variants:</label>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {colorVariants.map((v, idx) => {
+                          const linkedProd = allProductsList.find(p => p._id === v.product);
+                          return (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8f9fa', padding: '0.5rem 0.75rem', borderRadius: '6px', fontSize: '0.8rem', border: '1px solid #e9ecef' }}>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                {linkedProd && linkedProd.image && (
+                                  <img src={linkedProd.image} style={{ width: '20px', height: '20px', objectFit: 'cover', borderRadius: '4px' }} alt="" />
+                                )}
+                                <strong>{v.colorName}</strong> &rarr; {linkedProd ? linkedProd.name : 'Unknown Product'}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveColorVariant(idx)}
+                                style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '2px' }}
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>

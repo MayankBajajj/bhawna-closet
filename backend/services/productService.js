@@ -71,7 +71,10 @@ export const getProductsService = async ({ page = 1, limit = 12, category, searc
 };
 
 export const getProductBySlugService = async (slug) => {
-  const product = await Product.findOne({ slug, isDeleted: { $ne: true } });
+  const product = await Product.findOne({ slug, isDeleted: { $ne: true } }).populate({
+    path: 'colorVariants.product',
+    select: 'name slug image images colorName colors price discountPrice sizes'
+  });
   if (!product) {
     throw new Error('Product not found');
   }
