@@ -7,6 +7,8 @@ import Product from '../models/Product.js';
 import Cart from '../models/Cart.js';
 import WebhookLog from '../models/WebhookLog.js';
 import { syncOrderToShiprocket } from '../services/shiprocketService.js';
+import { sendOrderNotificationToAdmin, sendOrderConfirmationToCustomer } from '../services/emailService.js';
+import User from '../models/User.js';
 
 // Initialize Razorpay
 const getRazorpayInstance = () => {
@@ -231,11 +233,22 @@ export const verifyRazorpayPayment = async (req, res, next) => {
       isPartialCod
     );
 
-    // Trigger async Shiprocket sync in the background
+    // Trigger async Shiprocket sync and email notifications in the background
     if (!alreadyProcessed) {
       syncOrderToShiprocket(order._id).catch(err => {
         console.error(`Background Shiprocket sync failed for order ${order._id}:`, err.message);
       });
+
+      sendOrderNotificationToAdmin(order).catch(err => {
+        console.error(`Failed to send order email notification to admin:`, err.message);
+      });
+
+      const customerEmail = req.user ? req.user.email : '';
+      if (customerEmail) {
+        sendOrderConfirmationToCustomer(order, customerEmail).catch(err => {
+          console.error(`Failed to send order email confirmation to customer:`, err.message);
+        });
+      }
     }
 
     res.status(201).json({
@@ -318,7 +331,7 @@ export const razorpayWebhook = async (req, res, next) => {
           const isPartialCod = notes.isPartialCod === 'true';
           const orderTotal = notes.totalAmount ? parseFloat(notes.totalAmount) : payment.amount;
 
-          const { order } = await finalizeOrderInTransaction(
+          const { order, alreadyProcessed } = await finalizeOrderInTransaction(
             payment.userId,
             razorpayOrderId,
             razorpayPaymentId,
@@ -329,10 +342,26 @@ export const razorpayWebhook = async (req, res, next) => {
             isPartialCod
           );
 
-          // Trigger async Shiprocket sync
-          syncOrderToShiprocket(order._id).catch(err => {
-            console.error(`Background Shiprocket sync failed for order ${order._id}:`, err.message);
-          });
+          if (!alreadyProcessed) {
+            // Trigger async Shiprocket sync
+            syncOrderToShiprocket(order._id).catch(err => {
+              console.error(`Background Shiprocket sync failed for order ${order._id}:`, err.message);
+            });
+
+            sendOrderNotificationToAdmin(order).catch(err => {
+              console.error(`Webhook admin email notification failed:`, err.message);
+            });
+
+            User.findById(payment.userId).then(u => {
+              if (u && u.email) {
+                sendOrderConfirmationToCustomer(order, u.email).catch(err => {
+                  console.error(`Webhook customer email confirmation failed:`, err.message);
+                });
+              }
+            }).catch(err => {
+              console.error(`Failed to find user for email confirmation:`, err.message);
+            });
+          }
 
           log.processed = true;
           await log.save();
